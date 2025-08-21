@@ -39,6 +39,7 @@ class UIManager {
             // 对话
             dialogueBox: document.getElementById('dialogueBox'),
             npcText: document.getElementById('npcText'),
+            skipHint: document.getElementById('skipHint'),
             
             // 选项
             optionsOverlay: document.getElementById('optionsOverlay'),
@@ -196,10 +197,6 @@ class UIManager {
         const segment = this.currentTextSegments[this.currentSegmentIndex];
         
         this.elements.npcText.innerHTML = '';
-        // // 如果不是第一段，添加分段标识
-        // if (this.currentSegmentIndex > 0) {
-        //     this.elements.npcText.innerHTML += '\n\n';
-        // }
         
         // 逐字显示文本
         this.typeText(segment, () => {
@@ -222,8 +219,9 @@ class UIManager {
         this.currentFullText = text;
         this.currentTypeCallback = onComplete;
         
-        // 添加打字状态类
+        // 添加打字状态类并显示跳过提示
         this.elements.npcText.classList.add('typing');
+        this.elements.skipHint.classList.add('visible');
         
         let index = 0;
         const speed = 50; // 打字速度（毫秒）
@@ -239,8 +237,9 @@ class UIManager {
             } else {
                 this.isTyping = false;
                 this.typeTimeoutId = null;
-                // 移除打字状态类
+                // 移除打字状态类并隐藏跳过提示
                 this.elements.npcText.classList.remove('typing');
+                this.elements.skipHint.classList.remove('visible');
                 onComplete && onComplete();
             }
         };
@@ -264,8 +263,9 @@ class UIManager {
         this.elements.npcText.textContent = this.currentFullText;
         this.isTyping = false;
         
-        // 移除打字状态类
+        // 移除打字状态类并隐藏跳过提示
         this.elements.npcText.classList.remove('typing');
+        this.elements.skipHint.classList.remove('visible');
         
         // 滚动到底部
         this.scrollToBottom();
@@ -531,5 +531,6 @@ class UIManager {
         this.currentTypeCallback = null;
         this.elements.npcText.style.cursor = 'default';
         this.elements.npcText.classList.remove('typing');
+        this.elements.skipHint.classList.remove('visible');
     }
 }

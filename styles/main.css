@@ -157,23 +157,6 @@ body {
     transition: background-color 0.2s ease;
 }
 
-/* 打字时的点击提示 */
-#npcText.typing {
-    position: relative;
-}
-
-#npcText.typing::after {
-    content: "点击跳过";
-    position: absolute;
-    bottom: 5px;
-    left: 15px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
-    pointer-events: none;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
 /* 自定义滚动条 */
 #npcText::-webkit-scrollbar {
     width: 6px;
@@ -222,6 +205,33 @@ body {
 
 #continueButton:hover, #completeButton:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+/* 跳过打字提示 */
+#skipHint {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    padding: 8px 20px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    height: 36px; /* 与继续按钮高度一致 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 打字时显示跳过提示 */
+#skipHint.visible {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* 选项遮罩层 */
@@ -493,10 +503,12 @@ body {
     }
     
     /* 手机端的跳过提示 */
-    #npcText.typing::after {
+    #skipHint {
+        bottom: 15px;
+        left: 15px;
+        padding: 6px 16px;
         font-size: 10px;
-        top: 3px;
-        right: 10px;
+        height: 32px; /* 手机端按钮高度 */
     }
     
     #continueButton, #completeButton {
