@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剧情交互游戏</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- 游戏主容器 -->
+    <div id="gameContainer">
+        <!-- 背景图片 -->
+        <div id="background"></div>
+        
+        <!-- 景点名称 -->
+        <div id="siteName"></div>
+        
+        <!-- 右上角按钮组 -->
+        <div id="topRightButtons">
+            <button id="exitButton" style="display: none;">告辞</button>
+            <button id="historyButton" style="display: none;">历史对话</button>
+        </div>
+        
+        <!-- 开始游戏界面 -->
+        <div id="startScreen">
+            <button id="startGameButton">开始游戏</button>
+        </div>
+        
+        <!-- 游戏主界面 -->
+        <div id="gameScreen" style="display: none;">
+            <!-- NPC对话框 -->
+            <div id="dialogueBox">
+                <div id="npcText"></div>
+                <button id="continueButton">继续</button>
+                <button id="completeButton">完成</button>
+            </div>
+        </div>
+        
+        <!-- 选项遮罩层 -->
+        <div id="optionsOverlay" style="display: none;">
+            <div id="optionsContainer"></div>
+        </div>
+        
+        <!-- 历史对话弹窗 -->
+        <div id="historyModal" style="display: none;">
+            <div id="historyContent">
+                <div id="historyHeader">
+                    <h3>历史对话</h3>
+                    <button id="closeHistoryButton">×</button>
+                </div>
+                <div id="historyList"></div>
+            </div>
+        </div>
+        
+        <!-- 确认对话框 -->
+        <div id="confirmModal" style="display: none;">
+            <div id="confirmContent">
+                <p id="confirmText"></p>
+                <div id="confirmButtons">
+                    <button id="confirmYes">是</button>
+                    <button id="confirmNo">否</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 成就弹窗 -->
+        <div id="achievementModal" style="display: none;">
+            <div id="achievementContent">
+                <p id="achievementText"></p>
+                <button id="achievementConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本文件 -->
+    <script src="config.js"></script>
+    <script src="scripts/gameData.js"></script>
+    <script src="scripts/gameState.js"></script>
+    <script src="scripts/navigationManager.js"></script>
+    <script src="scripts/uiManager.js"></script>
+    <script src="scripts/gameEngine.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
