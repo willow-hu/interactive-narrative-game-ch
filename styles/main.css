@@ -165,14 +165,13 @@ body {
 #npcText.typing::after {
     content: "点击跳过";
     position: absolute;
-    bottom: -60px; /* 相对于npcText，向下移动到与继续按钮同一水平线 */
-    left: 0px; /* 与对话框左边对齐 */
+    bottom: 5px;
+    left: 15px;
     font-size: 12px;
     color: rgba(255, 255, 255, 0.6);
     pointer-events: none;
     opacity: 1;
     transition: opacity 0.3s ease;
-    z-index: 7; /* 确保在对话框上方 */
 }
 
 /* 自定义滚动条 */
@@ -496,8 +495,8 @@ body {
     /* 手机端的跳过提示 */
     #npcText.typing::after {
         font-size: 10px;
-        bottom: -65px; /* 相对于手机端npcText，向下移动到与继续按钮同一水平线 */
-        left: 0px; /* 与对话框左边对齐 */
+        top: 3px;
+        right: 10px;
     }
     
     #continueButton, #completeButton {
