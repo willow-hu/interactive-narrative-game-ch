@@ -12,14 +12,24 @@ body {
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+    /* Safari特殊处理 */
+    -webkit-overflow-scrolling: touch;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 /* 游戏主容器 */
 #gameContainer {
     width: 100vw;
     height: 100vh;
+    /* Safari兼容性：使用fill-available替代vh */
+    height: -webkit-fill-available;
     position: relative;
     overflow: hidden;
+    /* 防止Safari地址栏影响 */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
 }
 
 /* 背景图片 */
@@ -155,13 +165,14 @@ body {
 #npcText.typing::after {
     content: "点击跳过";
     position: absolute;
-    bottom: 5px;
-    left: 15px;
+    bottom: -60px; /* 相对于npcText，向下移动到与继续按钮同一水平线 */
+    left: 0px; /* 与对话框左边对齐 */
     font-size: 12px;
     color: rgba(255, 255, 255, 0.6);
     pointer-events: none;
     opacity: 1;
     transition: opacity 0.3s ease;
+    z-index: 7; /* 确保在对话框上方 */
 }
 
 /* 自定义滚动条 */
@@ -485,8 +496,8 @@ body {
     /* 手机端的跳过提示 */
     #npcText.typing::after {
         font-size: 10px;
-        top: 3px;
-        right: 10px;
+        bottom: -65px; /* 相对于手机端npcText，向下移动到与继续按钮同一水平线 */
+        left: 0px; /* 与对话框左边对齐 */
     }
     
     #continueButton, #completeButton {
@@ -505,5 +516,75 @@ body {
     #optionsContainer {
         max-width: 90%;
         padding: 15px;
+    }
+}
+
+/* Safari浏览器特殊兼容 */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari专用样式 */
+    html {
+        height: 100%;
+        height: -webkit-fill-available;
+    }
+    
+    body {
+        height: 100%;
+        height: -webkit-fill-available;
+    }
+    
+    #gameContainer {
+        height: 100%;
+        height: -webkit-fill-available;
+        /* 防止弹跳效果 */
+        overscroll-behavior: none;
+    }
+    
+    /* 防止Safari地址栏变化时的高度调整 */
+    @media screen and (max-width: 767px) {
+        #gameContainer {
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+        }
+    }
+}
+
+/* 针对iPhone的特殊处理 */
+@media only screen 
+  and (device-width: 390px) 
+  and (device-height: 844px) 
+  and (-webkit-device-pixel-ratio: 3),
+only screen 
+  and (device-width: 428px) 
+  and (device-height: 926px) 
+  and (-webkit-device-pixel-ratio: 3),
+only screen 
+  and (device-width: 375px) 
+  and (device-height: 812px) 
+  and (-webkit-device-pixel-ratio: 3),
+only screen 
+  and (device-width: 414px) 
+  and (device-height: 896px) 
+  and (-webkit-device-pixel-ratio: 2) {
+    
+    #gameContainer {
+        height: 100vh;
+        height: -webkit-fill-available;
+        min-height: -webkit-fill-available;
+    }
+    
+    #dialogueBox {
+        bottom: max(15px, env(safe-area-inset-bottom));
+        left: max(15px, env(safe-area-inset-left));
+        right: max(15px, env(safe-area-inset-right));
+    }
+    
+    #topRightButtons {
+        top: max(15px, env(safe-area-inset-top));
+        right: max(15px, env(safe-area-inset-right));
+    }
+    
+    #siteName {
+        top: max(15px, env(safe-area-inset-top));
+        left: max(15px, env(safe-area-inset-left));
     }
 }
