@@ -431,7 +431,7 @@ class UIManager {
      * @param {Function} onConfirm - 确认回调
      */
     showAchievementModal(achievementName, onConfirm) {
-        this.elements.achievementText.textContent = `恭喜您解锁【${achievementName}】成就！`;
+        this.elements.achievementText.textContent = `恭喜您解锁成就！\n【${achievementName}】`;
         this.elements.achievementModal.style.display = 'flex';
         
         // 移除之前的事件监听器
