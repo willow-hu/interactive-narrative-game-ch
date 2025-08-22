@@ -90,10 +90,10 @@ class GameData {
     }
 
     /**
-     * 获取NPC图片路径
-     * @returns {string} NPC图片路径
+     * 获取NPC立绘路径
+     * @returns {string} NPC立绘路径
      */
-    getNpcImagePath() {
+    getNpcCharacterPath() {
         return `./imgs/${this.siteName}/npc.png`;
     }
 

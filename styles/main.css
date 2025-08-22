@@ -45,6 +45,32 @@ body {
     z-index: 1;
 }
 
+/* NPC立绘 */
+#npcCharacter {
+    position: absolute;
+    right: 5%;
+    bottom: 25%;
+    height: 33vh;
+    z-index: 3;
+    background-size: contain;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+}
+
+#npcCharacter.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#npcCharacter.hidden {
+    opacity: 0;
+    transform: translateX(100px);
+}
+
 /* 景点名称 */
 #siteName {
     position: absolute;
@@ -527,6 +553,13 @@ body {
     #optionsContainer {
         max-width: 90%;
         padding: 15px;
+    }
+    
+    /* 手机端NPC立绘调整 */
+    #npcCharacter {
+        right: 3%;
+        bottom: 20%;
+        height: 30vh;
     }
 }
 

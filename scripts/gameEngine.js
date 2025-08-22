@@ -50,6 +50,7 @@ class GameEngine {
         // 设置背景和标题
         if (metadata) {
             this.uiManager.setBackground(this.gameData.getBackgroundPath());
+            this.uiManager.setNpcCharacter(this.gameData.getNpcCharacterPath());
             this.uiManager.setSiteName(metadata.site_name || '景点');
         }
         
@@ -107,6 +108,9 @@ class GameEngine {
             console.error('场景不存在:', currentSceneId);
             return;
         }
+
+        // 显示NPC立绘（当NPC说话时）
+        this.uiManager.showNpcCharacter();
 
         // 添加NPC对话到历史记录
         const metadata = this.gameData.getMetadata();

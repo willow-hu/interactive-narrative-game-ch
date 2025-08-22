@@ -23,6 +23,7 @@ class UIManager {
             // 主要容器
             gameContainer: document.getElementById('gameContainer'),
             background: document.getElementById('background'),
+            npcCharacter: document.getElementById('npcCharacter'),
             siteName: document.getElementById('siteName'),
             
             // 屏幕
@@ -125,6 +126,47 @@ class UIManager {
      */
     setBackground(imagePath) {
         this.elements.background.style.backgroundImage = `url('${imagePath}')`;
+    }
+
+    /**
+     * 设置NPC立绘
+     * @param {string} imagePath - NPC立绘图片路径
+     */
+    setNpcCharacter(imagePath) {
+        this.elements.npcCharacter.style.backgroundImage = `url('${imagePath}')`;
+        // 获取图片的原始宽高比来设置立绘的宽度
+        const img = new Image();
+        img.onload = () => {
+            const aspectRatio = img.width / img.height;
+            const height = this.elements.npcCharacter.offsetHeight || (window.innerHeight * 0.33);
+            const width = height * aspectRatio;
+            this.elements.npcCharacter.style.width = `${width}px`;
+        };
+        img.src = imagePath;
+    }
+
+    /**
+     * 显示NPC立绘
+     */
+    showNpcCharacter() {
+        this.elements.npcCharacter.style.display = 'block';
+        // 使用setTimeout确保display设置生效后再添加visible类
+        setTimeout(() => {
+            this.elements.npcCharacter.classList.remove('hidden');
+            this.elements.npcCharacter.classList.add('visible');
+        }, 10);
+    }
+
+    /**
+     * 隐藏NPC立绘
+     */
+    hideNpcCharacter() {
+        this.elements.npcCharacter.classList.remove('visible');
+        this.elements.npcCharacter.classList.add('hidden');
+        // 动画完成后隐藏元素
+        setTimeout(() => {
+            this.elements.npcCharacter.style.display = 'none';
+        }, 500); // 与CSS transition时间一致
     }
 
     /**
@@ -329,6 +371,9 @@ class UIManager {
      * @param {Function} onOptionSelect - 选项选择回调
      */
     showOptions(options, onOptionSelect) {
+        // 显示选项时隐藏NPC立绘
+        this.hideNpcCharacter();
+        
         this.elements.optionsContainer.innerHTML = '';
         
         options.forEach((option, index) => {
@@ -352,6 +397,8 @@ class UIManager {
      */
     hideOptions() {
         this.elements.optionsOverlay.style.display = 'none';
+        // 隐藏选项后显示NPC立绘
+        this.showNpcCharacter();
     }
 
     /**
@@ -514,6 +561,7 @@ class UIManager {
         this.hideHistoryModal();
         this.hideConfirmModal();
         this.hideAchievementModal();
+        this.hideNpcCharacter(); // 重置时隐藏NPC立绘
         this.elements.continueButton.className = '';
         this.elements.completeButton.className = '';
         this.elements.npcText.innerHTML = '';
