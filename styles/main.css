@@ -56,19 +56,16 @@ body {
     background-position: center bottom;
     background-repeat: no-repeat;
     opacity: 0;
-    transform: translateX(0px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    /* transition: opacity 0.5s ease, transform 0.5s ease; */
     pointer-events: none;
 }
 
 #npcCharacter.visible {
     opacity: 1;
-    transform: translateX(0);
 }
 
 #npcCharacter.hidden {
     opacity: 0;
-    transform: translateX(0px);
 }
 
 /* 景点名称 */
