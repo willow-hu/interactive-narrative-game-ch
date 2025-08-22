@@ -56,7 +56,7 @@ body {
     background-position: center bottom;
     background-repeat: no-repeat;
     opacity: 0;
-    transform: translateX(100px);
+    transform: translateX(0px);
     transition: opacity 0.5s ease, transform 0.5s ease;
     pointer-events: none;
 }
@@ -68,7 +68,7 @@ body {
 
 #npcCharacter.hidden {
     opacity: 0;
-    transform: translateX(100px);
+    transform: translateX(0px);
 }
 
 /* 景点名称 */
