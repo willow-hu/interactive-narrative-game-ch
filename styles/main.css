@@ -164,7 +164,7 @@ body {
 #npcCharacter {
     position: absolute;
     right: 5%;
-    bottom: 50px;
+    bottom: 80px;
     height: 33vh;
     z-index: 3;
     background-size: contain;
