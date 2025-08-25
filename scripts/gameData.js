@@ -90,6 +90,31 @@ class GameData {
     }
 
     /**
+     * 获取特定场景的背景图片路径
+     * @param {string} sceneId - 场景ID
+     * @returns {string} 背景图片路径
+     */
+    getSceneBackgroundPath(sceneId) {
+        // 获取背景映射配置
+        const config = window.GAME_CONFIG;
+        if (!config || !config.backgroundMapping || !config.backgroundMapping[this.siteName]) {
+            return `./imgs/${this.siteName}/bg.png`; // 返回默认背景
+        }
+
+        const mapping = config.backgroundMapping[this.siteName];
+        
+        // 遍历映射配置，查找场景对应的背景图
+        for (const [backgroundFile, sceneList] of Object.entries(mapping)) {
+            if (sceneList.includes(sceneId)) {
+                return `./imgs/${this.siteName}/${backgroundFile}`;
+            }
+        }
+        
+        // 如果没有找到特定背景，返回默认背景
+        return `./imgs/${this.siteName}/bg.png`;
+    }
+
+    /**
      * 获取NPC立绘路径
      * @returns {string} NPC立绘路径
      */

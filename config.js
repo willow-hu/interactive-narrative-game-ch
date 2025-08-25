@@ -5,7 +5,23 @@
 
 // 方式1: 设置全局配置
 window.GAME_CONFIG = {
-    siteName: 'twin_pagoda'  // 可以改为其他站点名称
+    siteName: 'twin_pagoda',  // 可以改为其他站点名称
+    
+    // 背景图切换映射配置
+    // 格式: 背景图文件名 -> 对应的场景列表
+    backgroundMapping: {
+        'twin_pagoda': {
+
+            'ruin.png': ['scene_3_1', 'scene_6_1'],
+            'pagoda.png': ['scene_4_1', 'scene_4_4', 'scene_7_1', 'scene_9_1', 'scene_9_2'],
+            'columns.png': ['scene_6_2', 'scene_10_1', 'scene_10_2'],
+            'iron_top.png': ['scene_4_3', 'scene_8_1']
+        }
+        // 其他站点的背景映射可以在这里添加
+        // 'other_site': {
+        //     'special_bg.png': ['scene_1_1', 'scene_2_1']
+        // }
+    }
 };
 
 // 方式2: 也可以通过URL参数设置

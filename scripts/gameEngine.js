@@ -119,6 +119,9 @@ class GameEngine {
             return;
         }
 
+        // 更新背景图片（如果需要）
+        this.updateSceneBackground(currentSceneId);
+
         // 添加NPC对话到历史记录
         const metadata = this.gameData.getMetadata();
         const npcName = metadata ? metadata.role : 'NPC';
@@ -145,6 +148,15 @@ class GameEngine {
             }
             // 如果有选项，会在用户点击继续后显示
         }, buttonType);
+    }
+
+    /**
+     * 更新场景背景图片
+     * @param {string} sceneId - 场景ID
+     */
+    updateSceneBackground(sceneId) {
+        const newBackgroundPath = this.gameData.getSceneBackgroundPath(sceneId);
+        this.uiManager.changeBackground(newBackgroundPath);
     }
 
     /**
@@ -277,6 +289,11 @@ class GameEngine {
     returnToStart() {
         this.gameState.reset();
         this.uiManager.reset();
+        
+        // 恢复默认背景
+        const defaultBackground = this.gameData.getBackgroundPath();
+        this.uiManager.setBackground(defaultBackground);
+        
         this.uiManager.showStartScreen();
         
         // 通知树可视化管理器游戏重置 - 已禁用

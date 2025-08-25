@@ -129,6 +129,33 @@ class UIManager {
     }
 
     /**
+     * 切换背景图片（不带过渡效果）
+     * @param {string} imagePath - 新的图片路径
+     */
+    changeBackground(imagePath) {
+        // 如果新路径与当前路径相同，不进行切换
+        const currentBg = this.elements.background.style.backgroundImage;
+        const newBg = `url('${imagePath}')`;
+        if (currentBg === newBg) {
+            return;
+        }
+
+        // 预加载新图片以确保流畅切换
+        const img = new Image();
+        img.onload = () => {
+            // 直接切换背景图片
+            this.elements.background.style.backgroundImage = newBg;
+        };
+        
+        img.onerror = () => {
+            // 如果新图片加载失败，则不进行切换
+            console.warn(`背景图片加载失败: ${imagePath}`);
+        };
+        
+        img.src = imagePath;
+    }
+
+    /**
      * 设置NPC立绘
      * @param {string} imagePath - NPC立绘图片路径
      */
@@ -573,3 +600,15 @@ class UIManager {
         this.elements.skipHint.classList.remove('visible');
     }
 }
+        this.isTyping = false;
+        
+        // 清理打字相关状态
+        if (this.typeTimeoutId) {
+            clearTimeout(this.typeTimeoutId);
+            this.typeTimeoutId = null;
+        }
+        this.currentFullText = '';
+        this.currentTypeCallback = null;
+        this.elements.npcText.style.cursor = 'default';
+        this.elements.npcText.classList.remove('typing');
+        this.elements.skipHint.classList.remove('visible');
