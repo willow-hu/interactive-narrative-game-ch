@@ -150,7 +150,7 @@ body {
     overflow-y: auto;
     padding-right: 10px;
     /* 固定高度，为继续按钮预留空间 */
-    height: 200px; /* 固定文本区域高度 */
+    height: 220px; /* 固定文本区域高度 */
     /* 添加平滑滚动 */
     scroll-behavior: smooth;
     /* 文本不会因为内容少而显示不完整 */
