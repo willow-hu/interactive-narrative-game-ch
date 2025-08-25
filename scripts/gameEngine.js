@@ -8,7 +8,7 @@ class GameEngine {
         this.gameState = new GameState();
         this.uiManager = new UIManager();
         this.navigationManager = null;
-        this.treeVisualizationManager = null; // 树可视化管理器
+        // this.treeVisualizationManager = null; // 树可视化管理器 - 已禁用
         this.isInitialized = false;
         this.siteName = siteName;
     }
@@ -27,8 +27,8 @@ class GameEngine {
             // 初始化导航管理器
             this.navigationManager = new NavigationManager(this.gameData, this.gameState);
 
-            // 初始化树可视化管理器
-            this.treeVisualizationManager = new TreeVisualizationManager(this);
+            // 初始化树可视化管理器 - 已禁用
+            // this.treeVisualizationManager = new TreeVisualizationManager(this);
 
             // 设置UI
             this.setupUI();
@@ -99,10 +99,10 @@ class GameEngine {
         this.gameState.startGame();
         this.uiManager.showGameScreen();
         
-        // 通知树可视化管理器游戏开始
-        if (this.treeVisualizationManager) {
-            this.treeVisualizationManager.onGameStart(this.gameState.currentScene);
-        }
+        // 通知树可视化管理器游戏开始 - 已禁用
+        // if (this.treeVisualizationManager) {
+        //     this.treeVisualizationManager.onGameStart(this.gameState.currentScene);
+        // }
         
         this.playCurrentScene();
     }
@@ -182,20 +182,20 @@ class GameEngine {
                 // 进入结局
                 this.gameState.visitScene(option.next);
                 
-                // 通知树可视化管理器场景切换
-                if (this.treeVisualizationManager) {
-                    this.treeVisualizationManager.onSceneChange(option.next, false);
-                }
+                // 通知树可视化管理器场景切换 - 已禁用
+                // if (this.treeVisualizationManager) {
+                //     this.treeVisualizationManager.onSceneChange(option.next, false);
+                // }
                 
                 this.playCurrentScene();
             } else {
                 // 返回到之前的场景
                 this.navigationManager.handleBackNavigation(option.next);
                 
-                // 通知树可视化管理器场景切换（回退）
-                if (this.treeVisualizationManager) {
-                    this.treeVisualizationManager.onSceneChange(this.gameState.currentScene, true);
-                }
+                // 通知树可视化管理器场景切换（回退） - 已禁用
+                // if (this.treeVisualizationManager) {
+                //     this.treeVisualizationManager.onSceneChange(this.gameState.currentScene, true);
+                // }
                 
                 this.showCurrentSceneOptions();
             }
@@ -209,10 +209,10 @@ class GameEngine {
             this.gameState.selectOption(optionKey, option.user, option.next);
             
             if (option.next) {
-                // 通知树可视化管理器场景切换
-                if (this.treeVisualizationManager) {
-                    this.treeVisualizationManager.onSceneChange(option.next, false);
-                }
+                // 通知树可视化管理器场景切换 - 已禁用
+                // if (this.treeVisualizationManager) {
+                //     this.treeVisualizationManager.onSceneChange(option.next, false);
+                // }
                 
                 this.playCurrentScene();
             }
@@ -279,10 +279,10 @@ class GameEngine {
         this.uiManager.reset();
         this.uiManager.showStartScreen();
         
-        // 通知树可视化管理器游戏重置
-        if (this.treeVisualizationManager) {
-            this.treeVisualizationManager.onGameReset();
-        }
+        // 通知树可视化管理器游戏重置 - 已禁用
+        // if (this.treeVisualizationManager) {
+        //     this.treeVisualizationManager.onGameReset();
+        // }
         
         // 清除结局类型
         this.currentEndingType = null;
@@ -336,10 +336,10 @@ class GameEngine {
             gameEnded: this.gameState.gameEnded
         };
 
-        // 添加树可视化调试信息
-        if (this.treeVisualizationManager) {
-            baseInfo.treeVisualization = this.treeVisualizationManager.getDebugInfo();
-        }
+        // 添加树可视化调试信息 - 已禁用
+        // if (this.treeVisualizationManager) {
+        //     baseInfo.treeVisualization = this.treeVisualizationManager.getDebugInfo();
+        // }
 
         return baseInfo;
     }

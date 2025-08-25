@@ -1,6 +1,12 @@
 /**
  * 树状结构可视化管理器
  * 负责显示游戏剧情探索的树状结构图
+ * 
+ * 注意：此功能已被禁用
+ * 要重新启用，请：
+ * 1. 在 index.html 中取消注释 <script src="scripts/treeVisualization.js"></script>
+ * 2. 在 main.css 中取消注释树可视化相关样式
+ * 3. 在 gameEngine.js 中取消注释树可视化相关代码
  */
 
 /**
@@ -12,29 +18,9 @@ class TreeNode {
         this.parentId = parentId;
         this.children = [];
         this.status = 'unvisited'; // 'unvisited', 'visited', 'current'
-        this.position = this.calculatePosition();
-    }
-
-    /**
-     * 根据场景ID计算节点位置
-     */
-    calculatePosition() {
-        const match = this.sceneId.match(/scene_(\d+)_(\d+)/);
-        if (!match) return { x: 0, y: 0 };
-        
-        const level = parseInt(match[1]); // x值，决定垂直层级
-        const index = parseInt(match[2]); // y值，决定同层水平位置
-        
-        // 预定义布局参数
-        const levelSpacing = 60; // 层级间距
-        const nodeSpacing = 50;  // 同层节点间距
-        const startX = 30;       // 起始X位置
-        const startY = 20;       // 起始Y位置
-        
-        return {
-            x: startX + (level - 1) * levelSpacing,
-            y: startY + (index - 1) * nodeSpacing
-        };
+        this.depth = 0; // 实际访问深度
+        this.indexInLevel = 0; // 在同层中的索引
+        this.position = { x: 0, y: 0 }; // 位置将动态计算
     }
 
     /**
@@ -43,7 +29,15 @@ class TreeNode {
     addChild(childNode) {
         if (!this.children.includes(childNode)) {
             this.children.push(childNode);
+            childNode.depth = this.depth + 1;
         }
+    }
+
+    /**
+     * 设置在同层中的索引
+     */
+    setIndexInLevel(index) {
+        this.indexInLevel = index;
     }
 }
 
@@ -57,6 +51,17 @@ class TreeVisualization {
         this.nodes = new Map(); // sceneId -> TreeNode
         this.isVisible = false;
         this.currentSceneId = null;
+        this.levelNodes = new Map(); // depth -> Array of nodes
+        
+        // 布局参数
+        this.layoutConfig = {
+            levelSpacing: 55,    // 层级间的垂直间距
+            nodeSpacing: 45,     // 同层节点间的水平间距
+            startX: 25,          // 起始X位置
+            startY: 25,          // 起始Y位置
+            nodeRadius: 8,       // 节点半径
+            containerPadding: 15 // 容器内边距
+        };
         
         this.init();
     }
@@ -87,6 +92,7 @@ class TreeVisualization {
         this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this.svg.setAttribute('width', '100%');
         this.svg.setAttribute('height', '100%');
+        // 初始viewBox，会根据实际内容动态调整
         this.svg.setAttribute('viewBox', '0 0 300 400');
         this.container.appendChild(this.svg);
     }
@@ -167,13 +173,95 @@ class TreeVisualization {
         const node = new TreeNode(sceneId, parentSceneId);
         this.nodes.set(sceneId, node);
 
-        // 建立父子关系
+        // 建立父子关系并设置深度
         if (parentSceneId && this.nodes.has(parentSceneId)) {
             const parentNode = this.nodes.get(parentSceneId);
             parentNode.addChild(node);
+        } else {
+            // 根节点深度为0
+            node.depth = 0;
         }
+
+        // 更新层级节点映射
+        this.updateLevelNodes();
+        
+        // 重新计算所有节点位置
+        this.calculateLayout();
     }
 
+    /**
+     * 更新层级节点映射
+     */
+    updateLevelNodes() {
+        this.levelNodes.clear();
+        
+        this.nodes.forEach(node => {
+            if (!this.levelNodes.has(node.depth)) {
+                this.levelNodes.set(node.depth, []);
+            }
+            this.levelNodes.get(node.depth).push(node);
+        });
+
+        // 为每层的节点按添加顺序设置索引
+        this.levelNodes.forEach((nodesInLevel, depth) => {
+            nodesInLevel.forEach((node, index) => {
+                node.setIndexInLevel(index);
+            });
+        });
+    }
+
+    /**
+     * 计算所有节点的布局位置
+     */
+    calculateLayout() {
+        if (this.nodes.size === 0) return;
+
+        const config = this.layoutConfig;
+        
+        this.levelNodes.forEach((nodesInLevel, depth) => {
+            const levelWidth = (nodesInLevel.length - 1) * config.nodeSpacing;
+            const startX = config.startX - levelWidth / 2; // 居中对齐
+            
+            nodesInLevel.forEach((node, index) => {
+                node.position = {
+                    x: startX + index * config.nodeSpacing,
+                    y: config.startY + depth * config.levelSpacing
+                };
+            });
+        });
+
+        // 调整viewBox以适应内容
+        this.adjustViewBox();
+    }
+
+    /**
+     * 根据节点位置调整SVG的viewBox
+     */
+    adjustViewBox() {
+        if (this.nodes.size === 0) return;
+
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+
+        this.nodes.forEach(node => {
+            minX = Math.min(minX, node.position.x);
+            maxX = Math.max(maxX, node.position.x);
+            minY = Math.min(minY, node.position.y);
+            maxY = Math.max(maxY, node.position.y);
+        });
+
+        // 添加边距
+        const padding = this.layoutConfig.containerPadding;
+        const nodeRadius = this.layoutConfig.nodeRadius;
+        
+        const viewBoxX = minX - nodeRadius - padding;
+        const viewBoxY = minY - nodeRadius - padding;
+        const viewBoxWidth = (maxX - minX) + 2 * nodeRadius + 2 * padding;
+        const viewBoxHeight = (maxY - minY) + 2 * nodeRadius + 2 * padding;
+
+        this.svg.setAttribute('viewBox', 
+            `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`);
+    }
     /**
      * 设置当前节点
      */
@@ -246,11 +334,13 @@ class TreeVisualization {
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', node.position.x);
         circle.setAttribute('cy', node.position.y);
-        circle.setAttribute('r', '8'); // 节点半径
+        circle.setAttribute('r', this.layoutConfig.nodeRadius); // 使用配置中的半径
         circle.setAttribute('class', `tree-node tree-node-${node.status}`);
         
         // 添加场景ID作为数据属性，便于调试
         circle.setAttribute('data-scene-id', node.sceneId);
+        circle.setAttribute('data-depth', node.depth);
+        circle.setAttribute('data-index', node.indexInLevel);
         
         this.svg.appendChild(circle);
     }
@@ -260,8 +350,11 @@ class TreeVisualization {
      */
     reset() {
         this.nodes.clear();
+        this.levelNodes.clear();
         this.currentSceneId = null;
         this.svg.innerHTML = '';
+        // 重置viewBox
+        this.svg.setAttribute('viewBox', '0 0 300 400');
         this.hide();
     }
 
@@ -273,15 +366,26 @@ class TreeVisualization {
             sceneId,
             parentId: node.parentId,
             status: node.status,
+            depth: node.depth,
+            indexInLevel: node.indexInLevel,
             position: node.position,
             childCount: node.children.length
+        }));
+
+        const levelInfo = Array.from(this.levelNodes.entries()).map(([depth, nodes]) => ({
+            depth,
+            nodeCount: nodes.length,
+            nodeIds: nodes.map(n => n.sceneId)
         }));
 
         return {
             isVisible: this.isVisible,
             currentScene: this.currentSceneId,
             totalNodes: this.nodes.size,
-            nodes: nodeInfo
+            totalLevels: this.levelNodes.size,
+            layoutConfig: this.layoutConfig,
+            nodes: nodeInfo,
+            levels: levelInfo
         };
     }
 }
