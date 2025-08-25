@@ -1,0 +1,109 @@
+/* 响应式设计 */
+
+@media (max-width: 480px) {
+    #siteName {
+        font-size: 16px;
+        top: 15px;
+        left: 15px;
+    }
+    
+    #topRightButtons {
+        top: 15px;
+        right: 15px;
+    }
+    
+    #topRightButtons button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    #dialogueBox {
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        padding: 15px;
+        height: 180px; /* 手机端稍微减小高度 */
+    }
+    
+    #npcText {
+        font-size: 14px;
+        height: 100px; /* 手机端文本区域高度 */
+        min-height: 100px;
+    }
+    
+    /* 手机端的跳过提示 */
+    #skipHint {
+        bottom: 15px;
+        left: 15px;
+        padding: 6px 16px;
+        font-size: 10px;
+        height: 32px; /* 手机端按钮高度 */
+    }
+    
+    #continueButton, #completeButton {
+        bottom: 15px;
+        right: 15px;
+        padding: 6px 16px;
+        font-size: 12px;
+        height: 32px; /* 手机端按钮高度 */
+    }
+    
+    .option-button {
+        font-size: 14px;
+        padding: 12px 20px;
+    }
+    
+    #optionsContainer {
+        max-width: 90%;
+        padding: 15px;
+    }
+    
+    /* 手机端NPC立绘调整 */
+    #npcCharacter {
+        right: 3%;
+        bottom: 20%;
+        height: 30vh;
+    }
+    
+    /* 手机端树可视化调整 - 已禁用 */
+    /*
+    .tree-container {
+        top: 50px;
+        left: 15px;
+        width: 160px;
+        height: 220px;
+        padding: 6px;
+    }
+    */
+}
+
+/* Safari浏览器特殊兼容 */
+
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari专用样式 */
+    html {
+        height: 100%;
+        height: -webkit-fill-available;
+    }
+    
+    body {
+        height: 100%;
+        height: -webkit-fill-available;
+    }
+    
+    #gameContainer {
+        height: 100%;
+        height: -webkit-fill-available;
+        /* 防止弹跳效果 */
+        overscroll-behavior: none;
+    }
+    
+    /* 防止Safari地址栏变化时的高度调整 */
+    @media screen and (max-width: 767px) {
+        #gameContainer {
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+        }
+    }
+}
+

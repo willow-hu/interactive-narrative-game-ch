@@ -161,15 +161,6 @@ class UIManager {
      */
     setNpcCharacter(imagePath) {
         this.elements.npcCharacter.style.backgroundImage = `url('${imagePath}')`;
-        // 获取图片的原始宽高比来设置立绘的宽度
-        const img = new Image();
-        img.onload = () => {
-            const aspectRatio = img.width / img.height;
-            const height = this.elements.npcCharacter.offsetHeight || (window.innerHeight * 0.33);
-            const width = height * aspectRatio;
-            this.elements.npcCharacter.style.width = `${width}px`;
-        };
-        img.src = imagePath;
     }
 
     /**
@@ -579,7 +570,7 @@ class UIManager {
         this.hideHistoryModal();
         this.hideConfirmModal();
         this.hideAchievementModal();
-        this.hideNpcCharacter(); // 重置时隐藏NPC立绘
+        this.hideNpcCharacter(); // 重置时隐藏NPC立绘，游戏开始时会重新显示
         this.elements.continueButton.className = '';
         this.elements.completeButton.className = '';
         this.elements.npcText.innerHTML = '';
