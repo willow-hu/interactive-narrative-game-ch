@@ -149,14 +149,10 @@ body {
     line-height: 1.6;
     overflow-y: auto;
     padding-right: 10px;
-    /* 固定高度，为继续按钮预留空间 */
-    height: 220px; /* 固定文本区域高度 */
-    /* 添加平滑滚动 */
+    height: 180px; 
     scroll-behavior: smooth;
-    /* 文本不会因为内容少而显示不完整 */
     min-height: 120px;
     margin-bottom: 0; /* 移除动态margin */
-    /* 打字时的交互提示 */
     transition: background-color 0.2s ease;
 }
 
