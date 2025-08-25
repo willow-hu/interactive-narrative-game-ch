@@ -10,10 +10,12 @@ body {
     background: #000;
     overflow: hidden;
     user-select: none;
+    /* 移动端相关样式已注释 */
+    /*
     -webkit-user-select: none;
     -webkit-touch-callout: none;
-    /* Safari特殊处理 */
     -webkit-overflow-scrolling: touch;
+    */
     position: fixed;
     width: 100%;
     height: 100%;
@@ -23,13 +25,14 @@ body {
 #gameContainer {
     width: 100vw;
     height: 100vh;
-    /* Safari兼容性：使用fill-available替代vh */
+    /* Safari兼容性样式已注释 */
+    /*
     height: -webkit-fill-available;
-    position: relative;
-    overflow: hidden;
-    /* 防止Safari地址栏影响 */
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    */
+    position: relative;
+    overflow: hidden;
 }
 
 /* 背景图片 */
@@ -171,7 +174,8 @@ body {
     transition: background-color 0.2s ease;
 }
 
-/* 自定义滚动条 */
+/* 自定义滚动条 - 已注释 */
+/*
 #npcText::-webkit-scrollbar {
     width: 6px;
 }
@@ -185,6 +189,7 @@ body {
     background: rgba(255, 255, 255, 0.3);
     border-radius: 3px;
 }
+*/
 
 #continueButton, #completeButton {
     position: absolute;
@@ -484,7 +489,8 @@ body {
     background: #45a049;
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 已注释 */
+/*
 @media (max-width: 480px) {
     #siteName {
         font-size: 16px;
@@ -561,8 +567,10 @@ body {
     }
     */
 }
+*/
 
-/* Safari浏览器特殊兼容 */
+/* Safari浏览器特殊兼容 - 已注释 */
+/*
 @supports (-webkit-touch-callout: none) {
     /* iOS Safari专用样式 */
     html {
@@ -590,6 +598,7 @@ body {
         }
     }
 }
+*/
 
 /* 树状结构可视化 - 已禁用 */
 /*
@@ -636,7 +645,8 @@ body {
 }
 */
 
-/* 针对iPhone的特殊处理 */
+/* 针对iPhone的特殊处理 - 已注释 */
+/*
 @media only screen 
   and (device-width: 390px) 
   and (device-height: 844px) 
@@ -686,4 +696,4 @@ only screen
         padding: 8px;
     }
     */
-}
+*/
