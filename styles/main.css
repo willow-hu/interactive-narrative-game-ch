@@ -49,23 +49,14 @@ body {
 #npcCharacter {
     position: absolute;
     right: 5%;
-    bottom: 25%;
+    bottom: 33%;
     height: 33vh;
     z-index: 3;
     background-size: contain;
     background-position: center bottom;
     background-repeat: no-repeat;
-    opacity: 0;
-    /* transition: opacity 0.5s ease, transform 0.5s ease; */
     pointer-events: none;
-}
-
-#npcCharacter.visible {
-    opacity: 1;
-}
-
-#npcCharacter.hidden {
-    opacity: 0;
+    display: none; /* 默认隐藏 */
 }
 
 /* 景点名称 */
@@ -159,7 +150,7 @@ body {
     padding: 20px;
     color: white;
     z-index: 6;
-    height: 200px; /* 固定高度，稍微增加一些 */
+    height: 280px;
     display: flex;
     flex-direction: column;
 }
@@ -170,7 +161,7 @@ body {
     overflow-y: auto;
     padding-right: 10px;
     /* 固定高度，为继续按钮预留空间 */
-    height: 120px; /* 固定文本区域高度 */
+    height: 200px; /* 固定文本区域高度 */
     /* 添加平滑滚动 */
     scroll-behavior: smooth;
     /* 文本不会因为内容少而显示不完整 */
@@ -558,6 +549,15 @@ body {
         bottom: 20%;
         height: 30vh;
     }
+    
+    /* 手机端树可视化调整 */
+    .tree-container {
+        top: 50px; /* 手机端位置调整 */
+        left: 15px; /* 手机端位置调整 */
+        width: 140px; /* 手机端宽度：更小 */
+        height: 180px; /* 手机端高度：更小 */
+        padding: 6px; /* 手机端内边距：更小 */
+    }
 }
 
 /* Safari浏览器特殊兼容 */
@@ -587,6 +587,53 @@ body {
             height: calc(var(--vh, 1vh) * 100);
         }
     }
+}
+
+/* 树状结构可视化 */
+.tree-container {
+    position: absolute;
+    top: 60px; /* 位置：距离顶部距离 */
+    left: 20px; /* 位置：距离左侧距离 */
+    width: 180px; /* 尺寸：容器宽度 */
+    height: 250px; /* 尺寸：容器高度 */
+    background: rgba(0, 0, 0, 0.3); /* 背景色：半透明黑色 */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* 边框：半透明白色 */
+    border-radius: 8px; /* 圆角：8px */
+    z-index: 8; /* 层级：在背景之上，对话框之下 */
+    padding: 10px; /* 内边距：10px */
+    display: none; /* 默认隐藏 */
+}
+
+/* 树节点样式 */
+.tree-node {
+    stroke-width: 2; /* 边框宽度：2px */
+    transition: all 0.3s ease; /* 过渡动画：0.3秒 */
+}
+
+/* 未访问节点（实际上不会显示） */
+.tree-node-unvisited {
+    fill: transparent; /* 填充色：透明 */
+    stroke: transparent; /* 边框色：透明 */
+    display: none; /* 隐藏未访问节点 */
+}
+
+/* 已访问节点 */
+.tree-node-visited {
+    fill: #808080; /* 填充色：灰色 */
+    stroke: #606060; /* 边框色：深灰色 */
+}
+
+/* 当前节点 */
+.tree-node-current {
+    fill: #4CAF50; /* 填充色：绿色 */
+    stroke: #2E7D32; /* 边框色：深绿色 */
+}
+
+/* 连接线样式 */
+.tree-edge {
+    stroke: rgba(255, 255, 255, 0.4); /* 线条颜色：半透明白色 */
+    stroke-width: 1.5; /* 线条宽度：1.5px */
+    fill: none; /* 无填充 */
 }
 
 /* 针对iPhone的特殊处理 */
@@ -627,5 +674,14 @@ only screen
     #siteName {
         top: max(15px, env(safe-area-inset-top));
         left: max(15px, env(safe-area-inset-left));
+    }
+    
+    /* 手机端树可视化调整 */
+    .tree-container {
+        top: 50px; /* 手机端位置调整 */
+        left: 15px; /* 手机端位置调整 */
+        width: 150px; /* 手机端宽度：稍小 */
+        height: 200px; /* 手机端高度：稍小 */
+        padding: 8px; /* 手机端内边距：稍小 */
     }
 }

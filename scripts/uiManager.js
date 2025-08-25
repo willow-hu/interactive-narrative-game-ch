@@ -150,23 +150,13 @@ class UIManager {
      */
     showNpcCharacter() {
         this.elements.npcCharacter.style.display = 'block';
-        // 使用setTimeout确保display设置生效后再添加visible类
-        setTimeout(() => {
-            this.elements.npcCharacter.classList.remove('hidden');
-            this.elements.npcCharacter.classList.add('visible');
-        }, 10);
     }
 
     /**
      * 隐藏NPC立绘
      */
     hideNpcCharacter() {
-        this.elements.npcCharacter.classList.remove('visible');
-        this.elements.npcCharacter.classList.add('hidden');
-        // 动画完成后隐藏元素
-        setTimeout(() => {
-            this.elements.npcCharacter.style.display = 'none';
-        }, 500); // 与CSS transition时间一致
+        this.elements.npcCharacter.style.display = 'none';
     }
 
     /**
@@ -204,6 +194,9 @@ class UIManager {
      * @param {string} buttonType - 按钮类型：'continue' 或 'complete'
      */
     showNpcText(text, onComplete, buttonType = 'continue') {
+        // 显示NPC立绘（与对话框同步）
+        this.showNpcCharacter();
+        
         // 分割文本（以双换行符分割）
         this.currentTextSegments = text.split('\n\n').filter(segment => segment.trim());
         this.currentSegmentIndex = 0;
@@ -371,8 +364,7 @@ class UIManager {
      * @param {Function} onOptionSelect - 选项选择回调
      */
     showOptions(options, onOptionSelect) {
-        // 显示选项时隐藏NPC立绘
-        this.hideNpcCharacter();
+        // 不再隐藏NPC立绘，让立绘与文本框完全同步
         
         this.elements.optionsContainer.innerHTML = '';
         
@@ -397,8 +389,7 @@ class UIManager {
      */
     hideOptions() {
         this.elements.optionsOverlay.style.display = 'none';
-        // 隐藏选项后显示NPC立绘
-        this.showNpcCharacter();
+        // 注意：不在这里显示NPC立绘，让它由showNpcText方法控制
     }
 
     /**

@@ -8,6 +8,7 @@ class GameEngine {
         this.gameState = new GameState();
         this.uiManager = new UIManager();
         this.navigationManager = null;
+        this.treeVisualizationManager = null; // 树可视化管理器
         this.isInitialized = false;
         this.siteName = siteName;
     }
@@ -25,6 +26,9 @@ class GameEngine {
 
             // 初始化导航管理器
             this.navigationManager = new NavigationManager(this.gameData, this.gameState);
+
+            // 初始化树可视化管理器
+            this.treeVisualizationManager = new TreeVisualizationManager(this);
 
             // 设置UI
             this.setupUI();
@@ -94,6 +98,12 @@ class GameEngine {
     startGame() {
         this.gameState.startGame();
         this.uiManager.showGameScreen();
+        
+        // 通知树可视化管理器游戏开始
+        if (this.treeVisualizationManager) {
+            this.treeVisualizationManager.onGameStart(this.gameState.currentScene);
+        }
+        
         this.playCurrentScene();
     }
 
@@ -109,15 +119,12 @@ class GameEngine {
             return;
         }
 
-        // 显示NPC立绘（当NPC说话时）
-        this.uiManager.showNpcCharacter();
-
         // 添加NPC对话到历史记录
         const metadata = this.gameData.getMetadata();
         const npcName = metadata ? metadata.role : 'NPC';
         this.gameState.addToHistory('npc', scene.npc, npcName);
 
-        // 显示NPC文本
+        // 显示NPC文本（NPC立绘将在showNpcText方法中显示）
         const isEndingScene = this.gameData.isEndingScene(currentSceneId);
         const buttonType = isEndingScene ? 'complete' : 'continue';
         
@@ -174,10 +181,22 @@ class GameEngine {
             if (option.next.startsWith('ending_')) {
                 // 进入结局
                 this.gameState.visitScene(option.next);
+                
+                // 通知树可视化管理器场景切换
+                if (this.treeVisualizationManager) {
+                    this.treeVisualizationManager.onSceneChange(option.next, false);
+                }
+                
                 this.playCurrentScene();
             } else {
                 // 返回到之前的场景
                 this.navigationManager.handleBackNavigation(option.next);
+                
+                // 通知树可视化管理器场景切换（回退）
+                if (this.treeVisualizationManager) {
+                    this.treeVisualizationManager.onSceneChange(this.gameState.currentScene, true);
+                }
+                
                 this.showCurrentSceneOptions();
             }
         } else {
@@ -190,6 +209,11 @@ class GameEngine {
             this.gameState.selectOption(optionKey, option.user, option.next);
             
             if (option.next) {
+                // 通知树可视化管理器场景切换
+                if (this.treeVisualizationManager) {
+                    this.treeVisualizationManager.onSceneChange(option.next, false);
+                }
+                
                 this.playCurrentScene();
             }
         }
@@ -255,6 +279,11 @@ class GameEngine {
         this.uiManager.reset();
         this.uiManager.showStartScreen();
         
+        // 通知树可视化管理器游戏重置
+        if (this.treeVisualizationManager) {
+            this.treeVisualizationManager.onGameReset();
+        }
+        
         // 清除结局类型
         this.currentEndingType = null;
     }
@@ -297,7 +326,7 @@ class GameEngine {
      * @returns {Object} 游戏状态信息
      */
     getGameInfo() {
-        return {
+        const baseInfo = {
             currentScene: this.gameState.currentScene,
             visitedScenes: Array.from(this.gameState.visitedScenes),
             selectedOptions: Array.from(this.gameState.selectedOptions),
@@ -306,5 +335,12 @@ class GameEngine {
             gameStarted: this.gameState.gameStarted,
             gameEnded: this.gameState.gameEnded
         };
+
+        // 添加树可视化调试信息
+        if (this.treeVisualizationManager) {
+            baseInfo.treeVisualization = this.treeVisualizationManager.getDebugInfo();
+        }
+
+        return baseInfo;
     }
 }
