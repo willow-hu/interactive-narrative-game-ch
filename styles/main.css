@@ -48,20 +48,6 @@ body {
     z-index: 1;
 }
 
-/* NPC立绘 */
-#npcCharacter {
-    position: absolute;
-    right: 5%;
-    bottom: 33%;
-    height: 33vh;
-    z-index: 3;
-    background-size: contain;
-    background-position: center bottom;
-    background-repeat: no-repeat;
-    pointer-events: none;
-    display: none; /* 默认隐藏 */
-}
-
 /* 景点名称 */
 #siteName {
     position: absolute;
@@ -153,7 +139,7 @@ body {
     padding: 20px;
     color: white;
     z-index: 6;
-    height: 280px;
+    height: 250px;
     display: flex;
     flex-direction: column;
 }
@@ -172,6 +158,20 @@ body {
     margin-bottom: 0; /* 移除动态margin */
     /* 打字时的交互提示 */
     transition: background-color 0.2s ease;
+}
+
+/* NPC立绘 */
+#npcCharacter {
+    position: absolute;
+    right: 5%;
+    bottom: 50px;
+    height: 33vh;
+    z-index: 3;
+    background-size: contain;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    display: none; /* 默认隐藏 */
 }
 
 /* 自定义滚动条 - 已注释 */
