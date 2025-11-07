@@ -45,14 +45,10 @@ class GameEngine {
      * 设置UI
      */
     setupUI() {
-        const metadata = this.gameData.getMetadata();
-        
-        // 设置背景和标题
-        if (metadata) {
-            this.uiManager.setBackground(this.gameData.getBackgroundPath());
-            this.uiManager.setNpcCharacter(this.gameData.getNpcCharacterPath());
-            this.uiManager.setSiteName(metadata.site_name || '景点');
-        }
+        // 设置背景和 NPC 立绘
+        this.uiManager.setBackground(this.gameData.getBackgroundPath());
+        this.uiManager.setNpcCharacter(this.gameData.getNpcCharacterPath());
+        this.uiManager.setSiteName(this.siteName);
         
         // 显示开始界面
         this.uiManager.showStartScreen();
@@ -113,26 +109,20 @@ class GameEngine {
         this.updateSceneBackground(currentSceneId);
 
         // 添加NPC对话到历史记录
-        const metadata = this.gameData.getMetadata();
-        const npcName = metadata ? metadata.role : 'NPC';
-        this.gameState.addToHistory('npc', scene.npc, npcName);
+        this.gameState.addToHistory('npc', scene.npc, 'NPC');
 
         // 显示NPC文本（NPC立绘将在showNpcText方法中显示）
         const isEndingScene = this.gameData.isEndingScene(currentSceneId);
         const buttonType = isEndingScene ? 'complete' : 'continue';
         
-        // 如果是结局场景，立即设置结局类型
+        // 如果是结局场景，标记游戏结束
         if (isEndingScene) {
-            const endingType = this.gameData.getEndingType(currentSceneId);
-            this.gameState.endGame(endingType);
-            this.currentEndingType = endingType;
+            this.gameState.endGame();
         }
         
         this.uiManager.showNpcText(scene.npc, () => {
             // 文本显示完成后的处理
-            if (this.gameData.isEndingScene(currentSceneId)) {
-                // 结局处理已经在上面完成，这里不需要再次调用
-            } else if (!scene.options || scene.options.length === 0) {
+            if (!this.gameData.isEndingScene(currentSceneId) && (!scene.options || scene.options.length === 0)) {
                 // 如果是叶子节点，自动进入返回逻辑
                 this.handleLeafNode();
             }
@@ -219,41 +209,11 @@ class GameEngine {
     }
 
     /**
-     * 处理结局
-     * @param {string} endingSceneId - 结局场景ID
-     */
-    handleEnding(endingSceneId) {
-        const endingType = this.gameData.getEndingType(endingSceneId);
-        this.gameState.endGame(endingType);
-        
-        // 存储结局类型，以便完成按钮点击时使用
-        this.currentEndingType = endingType;
-    }
-
-    /**
      * 处理游戏完成（点击完成按钮时调用）
      */
     handleGameComplete() {
-        this.handleEndingComplete(this.currentEndingType);
-    }
-
-    /**
-     * 处理结局完成
-     * @param {string} endingType - 结局类型
-     */
-    handleEndingComplete(endingType) {
-        if (endingType === 'complete') {
-            // 显示成就弹窗
-            const metadata = this.gameData.getMetadata();
-            const achievementName = metadata ? metadata.achievement : '特殊成就';
-            
-            this.uiManager.showAchievementModal(achievementName, () => {
-                this.returnToStart();
-            });
-        } else {
-            // 直接返回开始界面
-            this.returnToStart();
-        }
+        // 直接返回开始界面
+        this.returnToStart();
     }
 
     /**
@@ -268,9 +228,6 @@ class GameEngine {
         this.uiManager.setBackground(defaultBackground);
         
         this.uiManager.showStartScreen();
-
-        // 清除结局类型
-        this.currentEndingType = null;
     }
 
     /**
@@ -280,8 +237,8 @@ class GameEngine {
         this.uiManager.showConfirmModal(
             '确认要离开游戏吗？',
             () => {
-                // 确认退出，进入普通结局
-                this.gameState.visitScene('ending_normal');
+                // 确认退出，进入结局
+                this.gameState.visitScene('ending');
                 this.playCurrentScene();
             },
             () => {

@@ -11,15 +11,14 @@ window.GAME_CONFIG = {
     // 格式: 背景图文件名 -> 对应的场景列表
     backgroundMapping: {
         'twin_pagoda': {
-
-            'ruin.png': ['scene_3_1', 'scene_6_1'],
-            'pagoda.png': ['scene_4_1', 'scene_4_4', 'scene_7_1', 'scene_9_1', 'scene_9_2'],
-            'columns.png': ['scene_6_2', 'scene_10_1', 'scene_10_2'],
-            'iron_top.png': ['scene_4_3', 'scene_8_1']
+            'ruin.png': ['scene_5', 'scene_13'],
+            'pagoda.png': ['scene_6', 'scene_9', 'scene_15', 'scene_17', 'scene_18'],
+            'columns.png': ['scene_14', 'scene_19', 'scene_20'],
+            'iron_top.png': ['scene_8', 'scene_16']
         }
         // 其他站点的背景映射可以在这里添加
         // 'other_site': {
-        //     'special_bg.png': ['scene_1_1', 'scene_2_1']
+        //     'special_bg.png': ['scene_1', 'scene_2']
         // }
     }
 };
@@ -31,13 +30,14 @@ window.GAME_CONFIG = {
  * 站点配置说明：
  * 
  * 要添加新站点，需要：
- * 1. 在 game_scripts/ 文件夹中添加 {站点名}.json 脚本文件
- * 2. 在 imgs/ 文件夹中创建 {站点名}/ 文件夹
- * 3. 在站点文件夹中放入 bg.png 和 npc.png 图片
- * 4. 修改此文件中的 siteName 或使用URL参数
+ * 1. 在 game_assets/ 文件夹中创建 {站点名}/ 文件夹
+ * 2. 在站点文件夹中添加 script.json 脚本文件
+ * 3. 在 imgs/ 文件夹中创建 {站点名}/ 文件夹
+ * 4. 在站点文件夹中放入 bg.png 和 npc.png 图片
+ * 5. 修改此文件中的 siteName 或使用URL参数
  * 
  * 例如添加新站点 'temple':
- * - game_scripts/temple.json
+ * - game_assets/temple/script.json
  * - imgs/temple/bg.png
  * - imgs/temple/npc.png
  * - 设置 siteName: 'temple'

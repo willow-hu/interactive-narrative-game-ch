@@ -4,8 +4,9 @@
  */
 class GameData {
     constructor(siteName = 'twin_pagoda') {
-        this.gameScript = null;
-        this.metadata = null;
+        this.introScript = null;
+        this.mainScript = null;
+        this.endingScript = null;
         this.siteName = siteName;
     }
 
@@ -14,12 +15,27 @@ class GameData {
      */
     async loadGameScript() {
         try {
-            const response = await fetch(`./game_scripts/${this.siteName}.json`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // 加载 intro
+            const introResponse = await fetch('./game_scripts/intro.json');
+            if (!introResponse.ok) {
+                throw new Error(`加载 intro 失败! status: ${introResponse.status}`);
             }
-            this.gameScript = await response.json();
-            this.metadata = this.gameScript.metadata;
+            this.introScript = await introResponse.json();
+            
+            // 加载主体脚本
+            const mainResponse = await fetch(`./game_assets/${this.siteName}/script.json`);
+            if (!mainResponse.ok) {
+                throw new Error(`加载主体脚本失败! status: ${mainResponse.status}`);
+            }
+            this.mainScript = await mainResponse.json();
+            
+            // 加载 ending
+            const endingResponse = await fetch('./game_scripts/ending.json');
+            if (!endingResponse.ok) {
+                throw new Error(`加载 ending 失败! status: ${endingResponse.status}`);
+            }
+            this.endingScript = await endingResponse.json();
+            
             return true;
         } catch (error) {
             console.error('加载游戏脚本失败:', error);
@@ -34,18 +50,18 @@ class GameData {
      */
     getScene(sceneId) {
         // 首先在intro中查找
-        if (this.gameScript.intro && this.gameScript.intro[sceneId]) {
-            return this.gameScript.intro[sceneId];
+        if (this.introScript && this.introScript[sceneId]) {
+            return this.introScript[sceneId];
         }
         
-        // 然后在main_game中查找
-        if (this.gameScript.main_game && this.gameScript.main_game[sceneId]) {
-            return this.gameScript.main_game[sceneId];
+        // 然后在主体脚本中查找
+        if (this.mainScript && this.mainScript[sceneId]) {
+            return this.mainScript[sceneId];
         }
         
         // 最后在ending中查找
-        if (this.gameScript.ending && this.gameScript.ending[sceneId]) {
-            return this.gameScript.ending[sceneId];
+        if (this.endingScript && this.endingScript[sceneId]) {
+            return this.endingScript[sceneId];
         }
         
         return null;
@@ -58,27 +74,19 @@ class GameData {
     getAllSceneIds() {
         const sceneIds = [];
         
-        if (this.gameScript.intro) {
-            sceneIds.push(...Object.keys(this.gameScript.intro));
+        if (this.introScript) {
+            sceneIds.push(...Object.keys(this.introScript));
         }
         
-        if (this.gameScript.main_game) {
-            sceneIds.push(...Object.keys(this.gameScript.main_game));
+        if (this.mainScript) {
+            sceneIds.push(...Object.keys(this.mainScript));
         }
         
-        if (this.gameScript.ending) {
-            sceneIds.push(...Object.keys(this.gameScript.ending));
+        if (this.endingScript) {
+            sceneIds.push(...Object.keys(this.endingScript));
         }
         
         return sceneIds;
-    }
-
-    /**
-     * 获取游戏元数据
-     * @returns {Object} 元数据对象
-     */
-    getMetadata() {
-        return this.metadata;
     }
 
     /**
@@ -128,20 +136,6 @@ class GameData {
      * @returns {boolean} 是否为结局场景
      */
     isEndingScene(sceneId) {
-        return this.gameScript.ending && this.gameScript.ending[sceneId];
-    }
-
-    /**
-     * 获取结局类型
-     * @param {string} sceneId - 场景ID
-     * @returns {string|null} 结局类型
-     */
-    getEndingType(sceneId) {
-        if (sceneId === 'ending_complete') {
-            return 'complete';
-        } else if (sceneId === 'ending_normal') {
-            return 'normal';
-        }
-        return null;
+        return this.endingScript && this.endingScript[sceneId];
     }
 }

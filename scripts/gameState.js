@@ -135,11 +135,9 @@ class GameState {
 
     /**
      * 结束游戏
-     * @param {string} endingType - 结局类型
      */
-    endGame(endingType) {
+    endGame() {
         this.gameEnded = true;
-        this.endingType = endingType;
     }
 
     /**

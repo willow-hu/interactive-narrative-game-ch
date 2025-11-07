@@ -36,7 +36,7 @@ class NavigationManager {
                         // 所有分支都已探索，返回结局选项
                         return {
                             user: "谢谢您的讲解",
-                            next: this.shouldShowCompleteEnding() ? "ending_complete" : "ending_normal",
+                            next: "ending",
                             isBack: true
                         };
                     } else {
@@ -68,18 +68,9 @@ class NavigationManager {
         // 如果没有找到未探索的分支，返回结局选项
         return {
             user: "谢谢您的讲解",
-            next: this.shouldShowCompleteEnding() ? "ending_complete" : "ending_normal",
+            next: "ending",
             isBack: true
         };
-    }
-
-    /**
-     * 判断是否应该显示完整结局
-     * @returns {boolean} 是否显示完整结局
-     */
-    shouldShowCompleteEnding() {
-        const allSceneIds = this.gameData.getAllSceneIds();
-        return this.gameState.hasExploredAllScenes(allSceneIds);
     }
 
     /**
