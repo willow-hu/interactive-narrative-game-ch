@@ -8,22 +8,17 @@ let gameEngine = null;
 
 /**
  * 获取站点名称参数
- * 可以通过URL参数、配置文件或默认值获取
+ * 可以通过URL参数或默认值获取
  */
 function getSiteName() {
-    // 1. 首先检查URL参数
+    // 检查URL参数
     const urlParams = new URLSearchParams(window.location.search);
     const siteFromUrl = urlParams.get('site');
     if (siteFromUrl) {
         return siteFromUrl;
     }
     
-    // 2. 检查是否有配置文件或全局配置
-    if (window.GAME_CONFIG && window.GAME_CONFIG.siteName) {
-        return window.GAME_CONFIG.siteName;
-    }
-    
-    // 3. 默认值
+    // 默认值
     return 'twin_pagoda';
 }
 

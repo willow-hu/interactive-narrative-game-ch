@@ -90,44 +90,54 @@ class GameData {
     }
 
     /**
-     * 获取背景图片路径
-     * @returns {string} 背景图片路径
-     */
-    getBackgroundPath() {
-        return `./imgs/${this.siteName}/bg.png`;
-    }
-
-    /**
      * 获取特定场景的背景图片路径
      * @param {string} sceneId - 场景ID
-     * @returns {string} 背景图片路径
+     * @returns {string|null} 背景图片路径，如果不需要背景则返回null
      */
     getSceneBackgroundPath(sceneId) {
-        // 获取背景映射配置
-        const config = window.GAME_CONFIG;
-        if (!config || !config.backgroundMapping || !config.backgroundMapping[this.siteName]) {
-            return `./imgs/${this.siteName}/bg.png`; // 返回默认背景
-        }
-
-        const mapping = config.backgroundMapping[this.siteName];
-        
-        // 遍历映射配置，查找场景对应的背景图
-        for (const [backgroundFile, sceneList] of Object.entries(mapping)) {
-            if (sceneList.includes(sceneId)) {
-                return `./imgs/${this.siteName}/${backgroundFile}`;
-            }
+        // 引导语和结束语不显示背景
+        if (this.isIntroScene(sceneId) || this.isEndingScene(sceneId)) {
+            return null;
         }
         
-        // 如果没有找到特定背景，返回默认背景
-        return `./imgs/${this.siteName}/bg.png`;
+        const scene = this.getScene(sceneId);
+        
+        if (scene && scene.bg) {
+            return `./game_assets/${this.siteName}/bg/${scene.bg}`;
+        }
+        
+        // 如果场景没有指定背景，返回null
+        return null;
     }
 
     /**
-     * 获取NPC立绘路径
-     * @returns {string} NPC立绘路径
+     * 获取特定场景的NPC立绘路径
+     * @param {string} sceneId - 场景ID
+     * @returns {string|null} NPC立绘路径，如果不需要立绘则返回null
      */
-    getNpcCharacterPath() {
-        return `./imgs/${this.siteName}/npc.png`;
+    getSceneNpcCharacterPath(sceneId) {
+        // 引导语和结束语不显示NPC立绘
+        if (this.isIntroScene(sceneId) || this.isEndingScene(sceneId)) {
+            return null;
+        }
+        
+        const scene = this.getScene(sceneId);
+        
+        if (scene && scene.role) {
+            return `./game_assets/${this.siteName}/npc/${scene.role}`;
+        }
+        
+        // 如果场景没有指定立绘，返回null
+        return null;
+    }
+
+    /**
+     * 检查是否为引导语场景
+     * @param {string} sceneId - 场景ID
+     * @returns {boolean} 是否为引导语场景
+     */
+    isIntroScene(sceneId) {
+        return this.introScript && this.introScript[sceneId];
     }
 
     /**

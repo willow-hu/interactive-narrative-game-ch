@@ -130,9 +130,16 @@ class UIManager {
 
     /**
      * 切换背景图片（不带过渡效果）
-     * @param {string} imagePath - 新的图片路径
+     * @param {string|null} imagePath - 新的图片路径，null表示使用黑色背景
      */
     changeBackground(imagePath) {
+        // 如果路径为null，设置为黑色背景
+        if (imagePath === null) {
+            this.elements.background.style.backgroundImage = 'none';
+            this.elements.background.style.backgroundColor = '#000000';
+            return;
+        }
+
         // 如果新路径与当前路径相同，不进行切换
         const currentBg = this.elements.background.style.backgroundImage;
         const newBg = `url('${imagePath}')`;
@@ -144,12 +151,15 @@ class UIManager {
         const img = new Image();
         img.onload = () => {
             // 直接切换背景图片
+            this.elements.background.style.backgroundColor = 'transparent';
             this.elements.background.style.backgroundImage = newBg;
         };
         
         img.onerror = () => {
-            // 如果新图片加载失败，则不进行切换
+            // 如果新图片加载失败，使用黑色背景
             console.warn(`背景图片加载失败: ${imagePath}`);
+            this.elements.background.style.backgroundImage = 'none';
+            this.elements.background.style.backgroundColor = '#000000';
         };
         
         img.src = imagePath;
@@ -157,10 +167,28 @@ class UIManager {
 
     /**
      * 设置NPC立绘
-     * @param {string} imagePath - NPC立绘图片路径
+     * @param {string|null} imagePath - NPC立绘图片路径，null表示隐藏立绘
      */
     setNpcCharacter(imagePath) {
-        this.elements.npcCharacter.style.backgroundImage = `url('${imagePath}')`;
+        // 如果路径为null，隐藏NPC立绘
+        if (imagePath === null) {
+            this.hideNpcCharacter();
+            return;
+        }
+
+        // 预加载新图片以确保流畅切换
+        const img = new Image();
+        img.onload = () => {
+            this.elements.npcCharacter.style.backgroundImage = `url('${imagePath}')`;
+        };
+        
+        img.onerror = () => {
+            console.warn(`NPC立绘加载失败: ${imagePath}`);
+            // 加载失败则隐藏立绘
+            this.hideNpcCharacter();
+        };
+        
+        img.src = imagePath;
     }
 
     /**
@@ -210,10 +238,15 @@ class UIManager {
      * @param {string} text - 要显示的文本
      * @param {Function} onComplete - 完成回调
      * @param {string} buttonType - 按钮类型：'continue' 或 'complete'
+     * @param {boolean} hasNpc - 是否有NPC立绘
      */
-    showNpcText(text, onComplete, buttonType = 'continue') {
-        // 显示NPC立绘（与对话框同步）
-        this.showNpcCharacter();
+    showNpcText(text, onComplete, buttonType = 'continue', hasNpc = true) {
+        // 只在有NPC立绘时显示（与对话框同步）
+        if (hasNpc) {
+            this.showNpcCharacter();
+        } else {
+            this.hideNpcCharacter();
+        }
         
         // 分割文本（以双换行符分割）
         this.currentTextSegments = text.split('\n\n').filter(segment => segment.trim());

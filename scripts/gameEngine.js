@@ -45,9 +45,13 @@ class GameEngine {
      * 设置UI
      */
     setupUI() {
-        // 设置背景和 NPC 立绘
-        this.uiManager.setBackground(this.gameData.getBackgroundPath());
-        this.uiManager.setNpcCharacter(this.gameData.getNpcCharacterPath());
+        // 设置初始背景为黑色
+        this.uiManager.changeBackground(null);
+        
+        // 隐藏NPC立绘
+        this.uiManager.hideNpcCharacter();
+        
+        // 设置景点名称
         this.uiManager.setSiteName(this.siteName);
         
         // 显示开始界面
@@ -105,13 +109,16 @@ class GameEngine {
             return;
         }
 
-        // 更新背景图片（如果需要）
-        this.updateSceneBackground(currentSceneId);
+        // 更新背景图片和NPC立绘
+        this.updateSceneAssets(currentSceneId);
 
         // 添加NPC对话到历史记录
         this.gameState.addToHistory('npc', scene.npc, 'NPC');
 
-        // 显示NPC文本（NPC立绘将在showNpcText方法中显示）
+        // 检查是否有NPC立绘
+        const hasNpc = this.gameData.getSceneNpcCharacterPath(currentSceneId) !== null;
+
+        // 显示NPC文本
         const isEndingScene = this.gameData.isEndingScene(currentSceneId);
         const buttonType = isEndingScene ? 'complete' : 'continue';
         
@@ -127,16 +134,27 @@ class GameEngine {
                 this.handleLeafNode();
             }
             // 如果有选项，会在用户点击继续后显示
-        }, buttonType);
+        }, buttonType, hasNpc);
     }
 
     /**
-     * 更新场景背景图片
+     * 更新场景资源（背景和NPC立绘）
      * @param {string} sceneId - 场景ID
      */
-    updateSceneBackground(sceneId) {
+    updateSceneAssets(sceneId) {
+        // 更新背景图片（null表示使用黑色背景）
         const newBackgroundPath = this.gameData.getSceneBackgroundPath(sceneId);
         this.uiManager.changeBackground(newBackgroundPath);
+        
+        // 更新NPC立绘（null表示隐藏立绘）
+        const newNpcPath = this.gameData.getSceneNpcCharacterPath(sceneId);
+        if (newNpcPath === null) {
+            // 没有立绘则隐藏
+            this.uiManager.hideNpcCharacter();
+        } else {
+            // 有立绘则设置并在显示文本时显示
+            this.uiManager.setNpcCharacter(newNpcPath);
+        }
     }
 
     /**
@@ -223,9 +241,8 @@ class GameEngine {
         this.gameState.reset();
         this.uiManager.reset();
         
-        // 恢复默认背景
-        const defaultBackground = this.gameData.getBackgroundPath();
-        this.uiManager.setBackground(defaultBackground);
+        // 恢复黑色背景
+        this.uiManager.changeBackground(null);
         
         this.uiManager.showStartScreen();
     }
