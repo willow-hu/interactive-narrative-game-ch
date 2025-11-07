@@ -485,52 +485,6 @@ body {
     background: #45a049;
 }
 
-
-/* 树状结构可视化 - 已禁用 */
-/*
-.tree-container {
-    position: absolute;
-    top: 60px;
-    left: 20px;
-    width: 200px;
-    height: 280px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    z-index: 8;
-    padding: 10px;
-    display: none;
-    overflow: hidden;
-}
-
-.tree-node {
-    stroke-width: 2;
-    transition: all 0.3s ease;
-}
-
-.tree-node-unvisited {
-    fill: transparent;
-    stroke: transparent;
-    display: none;
-}
-
-.tree-node-visited {
-    fill: #808080;
-    stroke: #606060;
-}
-
-.tree-node-current {
-    fill: #4CAF50;
-    stroke: #2E7D32;
-}
-
-.tree-edge {
-    stroke: rgba(255, 255, 255, 0.4);
-    stroke-width: 1.5;
-    fill: none;
-}
-*/
-
 /* 针对iPhone的特殊处理 - 已注释 */
 /*
 @media only screen 
