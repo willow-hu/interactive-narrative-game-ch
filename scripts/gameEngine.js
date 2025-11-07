@@ -106,8 +106,8 @@ class GameEngine {
      * 开始游戏（跳过教程，直接进入主体部分）
      */
     startGameWithoutTutorial() {
-        this.gameState.startGame();
-        // 直接跳转到 scene_1
+        // 手动设置游戏开始状态
+        this.gameState.gameStarted = true;
         this.gameState.visitScene('scene_1');
         this.uiManager.showGameScreen();
         this.playCurrentScene();
@@ -129,7 +129,7 @@ class GameEngine {
         this.updateSceneAssets(currentSceneId);
 
         // 添加NPC对话到历史记录
-        this.gameState.addToHistory('npc', scene.npc, 'NPC');
+        this.gameState.addToHistory('npc', scene.content || scene.npc, scene.role);
 
         // 检查是否有NPC立绘
         const hasNpc = this.gameData.getSceneNpcCharacterPath(currentSceneId) !== null;
@@ -143,7 +143,7 @@ class GameEngine {
             this.gameState.endGame();
         }
         
-        this.uiManager.showNpcText(scene.npc, () => {
+        this.uiManager.showNpcText(scene.content || scene.npc, () => {
             // 文本显示完成后的处理
             if (!this.gameData.isEndingScene(currentSceneId) && (!scene.options || scene.options.length === 0)) {
                 // 如果是叶子节点，自动进入返回逻辑
