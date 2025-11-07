@@ -624,15 +624,3 @@ class UIManager {
         this.elements.skipHint.classList.remove('visible');
     }
 }
-        this.isTyping = false;
-        
-        // 清理打字相关状态
-        if (this.typeTimeoutId) {
-            clearTimeout(this.typeTimeoutId);
-            this.typeTimeoutId = null;
-        }
-        this.currentFullText = '';
-        this.currentTypeCallback = null;
-        this.elements.npcText.style.cursor = 'default';
-        this.elements.npcText.classList.remove('typing');
-        this.elements.skipHint.classList.remove('visible');
