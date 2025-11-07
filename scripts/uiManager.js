@@ -24,7 +24,6 @@ class UIManager {
             gameContainer: document.getElementById('gameContainer'),
             background: document.getElementById('background'),
             npcCharacter: document.getElementById('npcCharacter'),
-            siteName: document.getElementById('siteName'),
             
             // 屏幕
             startScreen: document.getElementById('startScreen'),
@@ -204,14 +203,6 @@ class UIManager {
      */
     hideNpcCharacter() {
         this.elements.npcCharacter.style.display = 'none';
-    }
-
-    /**
-     * 设置景点名称
-     * @param {string} name - 景点名称
-     */
-    setSiteName(name) {
-        this.elements.siteName.textContent = name;
     }
 
     /**

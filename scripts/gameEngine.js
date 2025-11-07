@@ -51,9 +51,6 @@ class GameEngine {
         // 隐藏NPC立绘
         this.uiManager.hideNpcCharacter();
         
-        // 设置景点名称
-        this.uiManager.setSiteName(this.siteName);
-        
         // 显示开始界面
         this.uiManager.showStartScreen();
     }
