@@ -25,9 +25,9 @@ class NavigationManager {
                 break;
             }
             
-            // 如果回溯到了正式剧情的根节点 scene_1_1，且它没有未探索选项，
+            // 如果回溯到了正式剧情的根节点（第一个主场景），且它没有未探索选项，
             // 则说明所有分支都已探索完毕
-            if (sceneId === 'scene_1_1') {
+            if (sceneId === 'scene_1') {
                 const scene = this.gameData.getScene(sceneId);
                 if (scene && scene.options) {
                     // 只获取原始选项，不包含任何系统添加的返回选项
@@ -205,9 +205,8 @@ class NavigationManager {
      * @returns {boolean} 是否为引导语场景
      */
     isIntroScene(sceneId) {
-        // 引导语场景格式为 scene_0_x（第一个数字为0）
-        const scenePattern = /^scene_0_\d+$/;
-        return scenePattern.test(sceneId);
+        // 引导语场景格式为 intro_n
+        return sceneId.startsWith('intro_');
     }
 
     /**

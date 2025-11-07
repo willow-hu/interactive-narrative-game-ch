@@ -31,7 +31,7 @@ class GameState {
      */
     startGame() {
         this.gameStarted = true;
-        this.currentScene = 'scene_0_0';
+        this.currentScene = 'intro_0';
         this.visitScene(this.currentScene);
     }
 
