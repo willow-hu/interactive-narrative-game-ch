@@ -123,8 +123,8 @@ class GameData {
         
         const scene = this.getScene(sceneId);
         
-        if (scene && scene.role) {
-            return `./game_assets/${this.siteName}/npc/${scene.role}`;
+        if (scene && scene.npc_pic) {
+            return `./game_assets/${this.siteName}/npc/${scene.npc_pic}`;
         }
         
         // 如果场景没有指定立绘，返回null
