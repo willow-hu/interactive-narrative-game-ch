@@ -62,9 +62,14 @@ class GameEngine {
      * 绑定事件
      */
     bindEvents() {
-        // 开始游戏
+        // 开始游戏（观看教程）
         this.uiManager.onStartGame(() => {
             this.startGame();
+        });
+
+        // 跳过教程，直接进入游戏
+        this.uiManager.onSkipTutorial(() => {
+            this.startGameWithoutTutorial();
         });
 
         // 退出游戏
@@ -89,10 +94,21 @@ class GameEngine {
     }
 
     /**
-     * 开始游戏
+     * 开始游戏（包含教程）
      */
     startGame() {
         this.gameState.startGame();
+        this.uiManager.showGameScreen();
+        this.playCurrentScene();
+    }
+
+    /**
+     * 开始游戏（跳过教程，直接进入主体部分）
+     */
+    startGameWithoutTutorial() {
+        this.gameState.startGame();
+        // 直接跳转到 scene_1
+        this.gameState.visitScene('scene_1');
         this.uiManager.showGameScreen();
         this.playCurrentScene();
     }

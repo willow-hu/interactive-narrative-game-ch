@@ -32,6 +32,7 @@ class UIManager {
             
             // 按钮
             startGameButton: document.getElementById('startGameButton'),
+            skipTutorialButton: document.getElementById('skipTutorialButton'),
             exitButton: document.getElementById('exitButton'),
             historyButton: document.getElementById('historyButton'),
             continueButton: document.getElementById('continueButton'),
@@ -547,6 +548,14 @@ class UIManager {
      */
     onStartGame(callback) {
         this.elements.startGameButton.addEventListener('click', callback);
+    }
+
+    /**
+     * 绑定跳过教程按钮
+     * @param {Function} callback - 回调函数
+     */
+    onSkipTutorial(callback) {
+        this.elements.skipTutorialButton.addEventListener('click', callback);
     }
 
     /**
