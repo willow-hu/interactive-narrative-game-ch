@@ -8,6 +8,7 @@ class GameData {
         this.mainScript = null;
         this.endingScript = null;
         this.siteName = siteName;
+        this.uploadedGameData = null;
     }
 
     /**
@@ -15,32 +16,103 @@ class GameData {
      */
     async loadGameScript() {
         try {
-            // 加载 intro
-            const introResponse = await fetch('./game_scripts/intro.json');
-            if (!introResponse.ok) {
-                throw new Error(`加载 intro 失败! status: ${introResponse.status}`);
-            }
-            this.introScript = await introResponse.json();
+            // 检查是否为用户上传的游戏
+            const isUploadedGame = this.isUploadedGame(this.siteName);
             
-            // 加载主体脚本
-            const mainResponse = await fetch(`./game_assets/${this.siteName}/script.json`);
-            if (!mainResponse.ok) {
-                throw new Error(`加载主体脚本失败! status: ${mainResponse.status}`);
+            if (isUploadedGame) {
+                // 从localStorage加载用户上传的游戏
+                return await this.loadUploadedGameScript();
+            } else {
+                // 从服务器加载预设游戏
+                return await this.loadPresetGameScript();
             }
-            this.mainScript = await mainResponse.json();
-            
-            // 加载 ending
-            const endingResponse = await fetch('./game_scripts/ending.json');
-            if (!endingResponse.ok) {
-                throw new Error(`加载 ending 失败! status: ${endingResponse.status}`);
-            }
-            this.endingScript = await endingResponse.json();
-            
-            return true;
         } catch (error) {
             console.error('加载游戏脚本失败:', error);
             return false;
         }
+    }
+
+    /**
+     * 检查是否为上传的游戏
+     */
+    isUploadedGame(siteName) {
+        return localStorage.getItem(`game_${siteName}`) !== null;
+    }
+
+    /**
+     * 加载用户上传的游戏脚本
+     */
+    async loadUploadedGameScript() {
+        const gameDataJson = localStorage.getItem(`game_${this.siteName}`);
+        if (!gameDataJson) {
+            throw new Error('游戏数据不存在');
+        }
+        
+        const gameData = JSON.parse(gameDataJson);
+        
+        // 加载 intro
+        const introData = await this.loadFileFromStorage('./game_scripts/intro.json');
+        this.introScript = JSON.parse(introData);
+        
+        // 加载主体脚本（从上传的数据中）
+        if (!gameData['script.json']) {
+            throw new Error('游戏资源包中缺少script.json');
+        }
+        const mainScriptContent = atob(gameData['script.json']);
+        this.mainScript = JSON.parse(mainScriptContent);
+        
+        // 加载 ending
+        const endingData = await this.loadFileFromStorage('./game_scripts/ending.json');
+        this.endingScript = JSON.parse(endingData);
+        
+        // 保存游戏数据供后续使用
+        this.uploadedGameData = gameData;
+        
+        return true;
+    }
+
+    /**
+     * 从localStorage或服务器加载文件
+     */
+    async loadFileFromStorage(path) {
+        try {
+            const response = await fetch(path);
+            if (!response.ok) {
+                throw new Error(`加载失败: ${path}`);
+            }
+            return await response.text();
+        } catch (error) {
+            console.error('加载文件失败:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * 加载预设游戏脚本
+     */
+    async loadPresetGameScript() {
+        // 加载 intro
+        const introResponse = await fetch('./game_scripts/intro.json');
+        if (!introResponse.ok) {
+            throw new Error(`加载 intro 失败! status: ${introResponse.status}`);
+        }
+        this.introScript = await introResponse.json();
+        
+        // 加载主体脚本
+        const mainResponse = await fetch('./game_scripts/sample.json');
+        if (!mainResponse.ok) {
+            throw new Error(`加载主体脚本失败! status: ${mainResponse.status}`);
+        }
+        this.mainScript = await mainResponse.json();
+        
+        // 加载 ending
+        const endingResponse = await fetch('./game_scripts/ending.json');
+        if (!endingResponse.ok) {
+            throw new Error(`加载 ending 失败! status: ${endingResponse.status}`);
+        }
+        this.endingScript = await endingResponse.json();
+        
+        return true;
     }
 
     /**
@@ -103,6 +175,10 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.bg) {
+            // 检查是否为上传的游戏
+            if (this.uploadedGameData) {
+                return this.getUploadedImageDataUrl(`bg/${scene.bg}`);
+            }
             return `./game_assets/${this.siteName}/bg/${scene.bg}`;
         }
         
@@ -124,11 +200,42 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.npc_pic) {
+            // 检查是否为上传的游戏
+            if (this.uploadedGameData) {
+                return this.getUploadedImageDataUrl(`npc/${scene.npc_pic}`);
+            }
             return `./game_assets/${this.siteName}/npc/${scene.npc_pic}`;
         }
         
         // 如果场景没有指定立绘，返回null
         return null;
+    }
+
+    /**
+     * 从上传的游戏数据中获取图片的Data URL
+     * @param {string} relativePath - 相对路径
+     * @returns {string|null} Data URL或null
+     */
+    getUploadedImageDataUrl(relativePath) {
+        if (!this.uploadedGameData || !this.uploadedGameData[relativePath]) {
+            console.warn(`找不到上传的图片: ${relativePath}`);
+            return null;
+        }
+        
+        const base64Data = this.uploadedGameData[relativePath];
+        const extension = relativePath.split('.').pop().toLowerCase();
+        
+        // 根据文件扩展名确定MIME类型
+        let mimeType = 'image/png';
+        if (extension === 'jpg' || extension === 'jpeg') {
+            mimeType = 'image/jpeg';
+        } else if (extension === 'gif') {
+            mimeType = 'image/gif';
+        } else if (extension === 'webp') {
+            mimeType = 'image/webp';
+        }
+        
+        return `data:${mimeType};base64,${base64Data}`;
     }
 
     /**
