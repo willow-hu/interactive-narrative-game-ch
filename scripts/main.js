@@ -27,6 +27,12 @@ function getSiteName() {
  */
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // 隐藏游戏容器
+        const gameContainer = document.getElementById('gameContainer');
+        if (gameContainer) {
+            gameContainer.style.display = 'none';
+        }
+        
         // 显示加载提示
         showLoadingMessage();
         
@@ -43,6 +49,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 隐藏加载提示
         hideLoadingMessage();
         
+        // 显示游戏容器
+        if (gameContainer) {
+            gameContainer.style.display = 'block';
+        }
+        
         console.log('游戏准备就绪');
         
     } catch (error) {
@@ -55,26 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  * 显示加载提示
  */
 function showLoadingMessage() {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.id = 'loadingMessage';
-    loadingDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-size: 16px;
-        z-index: 1000;
-        text-align: center;
-    `;
-    loadingDiv.innerHTML = `
-        <div>游戏资源加载中...</div>
-        <div style="margin-top: 10px; font-size: 12px; color: #ccc;">正在加载图片资源</div>
-    `;
-    document.body.appendChild(loadingDiv);
+    const loadingDiv = document.getElementById('loadingMessage');
+    if (loadingDiv) {
+        loadingDiv.classList.add('visible');
+    }
 }
 
 /**
@@ -83,7 +78,7 @@ function showLoadingMessage() {
 function hideLoadingMessage() {
     const loadingDiv = document.getElementById('loadingMessage');
     if (loadingDiv) {
-        loadingDiv.remove();
+        loadingDiv.classList.remove('visible');
     }
 }
 
@@ -94,33 +89,18 @@ function hideLoadingMessage() {
 function showErrorMessage(message) {
     hideLoadingMessage();
     
-    const errorDiv = document.createElement('div');
-    errorDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(255, 0, 0, 0.9);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-size: 16px;
-        z-index: 1000;
-        text-align: center;
-    `;
-    errorDiv.innerHTML = `
-        <p>${message}</p>
-        <button onclick="window.location.reload()" style="
-            margin-top: 10px;
-            padding: 8px 16px;
-            background: white;
-            color: red;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        ">刷新页面</button>
-    `;
-    document.body.appendChild(errorDiv);
+    const errorDiv = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const reloadButton = document.getElementById('reloadButton');
+    
+    if (errorDiv && errorText) {
+        errorText.textContent = message;
+        errorDiv.classList.add('visible');
+        
+        if (reloadButton) {
+            reloadButton.onclick = () => window.location.reload();
+        }
+    }
 }
 
 /**
