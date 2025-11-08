@@ -39,6 +39,7 @@ class UIManager {
             
             // 对话
             dialogueBox: document.getElementById('dialogueBox'),
+            roleName: document.getElementById('roleName'),
             npcText: document.getElementById('npcText'),
             skipHint: document.getElementById('skipHint'),
             
@@ -203,6 +204,32 @@ class UIManager {
      */
     hideNpcCharacter() {
         this.elements.npcCharacter.style.display = 'none';
+    }
+
+    /**
+     * 设置角色名称
+     */
+    setRoleName(name) {
+        if (name) {
+            this.elements.roleName.textContent = name;
+            this.showRoleName();
+        } else {
+            this.hideRoleName();
+        }
+    }
+
+    /**
+     * 显示角色名称
+     */
+    showRoleName() {
+        this.elements.roleName.style.display = 'block';
+    }
+
+    /**
+     * 隐藏角色名称
+     */
+    hideRoleName() {
+        this.elements.roleName.style.display = 'none';
     }
 
     /**
@@ -604,6 +631,7 @@ class UIManager {
         this.hideConfirmModal();
         this.hideAchievementModal();
         this.hideNpcCharacter(); // 重置时隐藏NPC立绘，游戏开始时会重新显示
+        this.hideRoleName(); // 重置时隐藏角色名称
         this.elements.continueButton.className = '';
         this.elements.completeButton.className = '';
         this.elements.npcText.innerHTML = '';

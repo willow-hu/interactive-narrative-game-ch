@@ -125,6 +125,15 @@ class GameEngine {
         // 更新背景图片和NPC立绘
         this.updateSceneAssets(currentSceneId);
 
+        // 设置角色名称（只在主游戏场景显示，引导和结束场景不显示）
+        const isIntroScene = this.gameData.isIntroScene(currentSceneId);
+        const isEndingScene = this.gameData.isEndingScene(currentSceneId);
+        if (!isIntroScene && !isEndingScene && scene.role) {
+            this.uiManager.setRoleName(scene.role);
+        } else {
+            this.uiManager.hideRoleName();
+        }
+
         // 添加NPC对话到历史记录
         this.gameState.addToHistory('npc', scene.content || scene.npc, scene.role);
 
@@ -132,7 +141,6 @@ class GameEngine {
         const hasNpc = this.gameData.getSceneNpcCharacterPath(currentSceneId) !== null;
 
         // 显示NPC文本
-        const isEndingScene = this.gameData.isEndingScene(currentSceneId);
         const buttonType = isEndingScene ? 'complete' : 'continue';
         
         // 如果是结局场景，标记游戏结束
