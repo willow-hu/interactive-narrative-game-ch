@@ -3,7 +3,7 @@
  * 负责加载和管理游戏脚本数据
  */
 class GameData {
-    constructor(siteName = 'twin_pagoda') {
+    constructor(siteName = 'sample') {
         this.introScript = null;
         this.mainScript = null;
         this.endingScript = null;
@@ -98,8 +98,8 @@ class GameData {
         }
         this.introScript = await introResponse.json();
         
-        // 加载主体脚本
-        const mainResponse = await fetch('./game_scripts/sample.json');
+        // 加载主体脚本（从game_assets/siteName/script.json读取）
+        const mainResponse = await fetch(`./game_assets/${this.siteName}/script.json`);
         if (!mainResponse.ok) {
             throw new Error(`加载主体脚本失败! status: ${mainResponse.status}`);
         }

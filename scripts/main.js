@@ -19,7 +19,7 @@ function getSiteName() {
     }
     
     // 默认值
-    return 'twin_pagoda';
+    return 'sample';
 }
 
 /**

@@ -3,7 +3,7 @@
  * 负责游戏逻辑的核心控制
  */
 class GameEngine {
-    constructor(siteName = 'twin_pagoda') {
+    constructor(siteName = 'sample') {
         this.gameData = new GameData(siteName);
         this.gameState = new GameState();
         this.uiManager = new UIManager();
