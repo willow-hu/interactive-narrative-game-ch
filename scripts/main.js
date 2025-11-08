@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function showLoadingMessage() {
     const loadingDiv = document.getElementById('loadingMessage');
     if (loadingDiv) {
-        loadingDiv.classList.add('visible');
+        loadingDiv.style.display = 'flex';
     }
 }
 
@@ -78,7 +78,7 @@ function showLoadingMessage() {
 function hideLoadingMessage() {
     const loadingDiv = document.getElementById('loadingMessage');
     if (loadingDiv) {
-        loadingDiv.classList.remove('visible');
+        loadingDiv.style.display = 'none';
     }
 }
 
@@ -95,7 +95,7 @@ function showErrorMessage(message) {
     
     if (errorDiv && errorText) {
         errorText.textContent = message;
-        errorDiv.classList.add('visible');
+        errorDiv.style.display = 'block';
         
         if (reloadButton) {
             reloadButton.onclick = () => window.location.reload();
