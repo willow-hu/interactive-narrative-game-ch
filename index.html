@@ -19,22 +19,6 @@
                     <div class="divider">或</div>
                 </div>
                 
-                <div id="presetGames">
-                    <h3>预设游戏</h3>
-                    <div id="presetGamesList">
-                        <div class="game-item">
-                            <div class="game-info">
-                                <div class="game-name">双塔寺游览</div>
-                                <div class="game-meta">苏州双塔景点交互式剧情游戏</div>
-                            </div>
-                            <div class="game-actions">
-                                <button class="game-button play-button" onclick="window.location.href='game.html?site=sample'">开始游戏</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="divider">或</div>
-                </div>
-                
                 <div id="uploadForm">
                     <h3>上传自定义游戏</h3>
                     <div class="form-group">
@@ -45,11 +29,17 @@
                     <div class="form-group">
                         <label for="zipFile">游戏资源包：</label>
                         <input type="file" id="zipFile" accept=".zip" />
-                        <p class="hint">请上传包含script.json和资源文件夹(bg/、npc/)的ZIP压缩包</p>
+                        <p class="hint">请上传游戏资源压缩包</p>
                     </div>
                     
                     <button id="uploadButton" disabled>上传并开始游戏</button>
                 </div>
+            </div>
+            
+            <div id="presetGameLink">
+                <button class="preset-game-button" onclick="window.location.href='game.html?site=sample'">
+                    体验预设游戏：苏州双塔
+                </button>
             </div>
             
             <div id="progressArea" style="display: none;">

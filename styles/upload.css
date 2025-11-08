@@ -226,6 +226,27 @@ input[type="file"]:hover {
     cursor: not-allowed;
 }
 
+#presetGameLink {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.preset-game-button {
+    padding: 10px 20px;
+    background: #f5f5f5;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.preset-game-button:hover {
+    background: #667eea;
+    color: white;
+}
+
 #progressArea {
     text-align: center;
 }
