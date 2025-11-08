@@ -209,8 +209,8 @@ class GameEngine {
     handleOptionSelection(option) {
         if (option.isBack) {
             // 处理返回选项
-            if (option.next.startsWith('ending_')) {
-                // 进入结局
+            if (option.next === 'ending' || option.next.startsWith('ending_')) {
+                // 进入结局场景
                 this.gameState.visitScene(option.next);
                 this.playCurrentScene();
             } else {
@@ -251,8 +251,8 @@ class GameEngine {
      * 处理游戏完成（点击完成按钮时调用）
      */
     handleGameComplete() {
-        // 直接返回开始界面
-        this.returnToStart();
+        // 返回到上传资料界面
+        window.location.href = 'index.html';
     }
 
     /**
@@ -275,7 +275,7 @@ class GameEngine {
         this.uiManager.showConfirmModal(
             '确认要离开游戏吗？',
             () => {
-                // 确认退出，进入结局
+                // 确认退出，进入结局场景
                 this.gameState.visitScene('ending');
                 this.playCurrentScene();
             },
