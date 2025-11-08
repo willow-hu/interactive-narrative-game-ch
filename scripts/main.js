@@ -68,8 +68,12 @@ function showLoadingMessage() {
         border-radius: 10px;
         font-size: 16px;
         z-index: 1000;
+        text-align: center;
     `;
-    loadingDiv.textContent = '游戏加载中...';
+    loadingDiv.innerHTML = `
+        <div>游戏资源加载中...</div>
+        <div style="margin-top: 10px; font-size: 12px; color: #ccc;">正在加载图片资源</div>
+    `;
     document.body.appendChild(loadingDiv);
 }
 

@@ -26,6 +26,9 @@ class GameEngine {
             // 初始化导航管理器
             this.navigationManager = new NavigationManager(this.gameData, this.gameState);
 
+            // 预加载所有图片资源
+            await this.preloadAssets();
+
             // 设置UI
             this.setupUI();
             
@@ -39,6 +42,56 @@ class GameEngine {
             console.error('游戏初始化失败:', error);
             alert('游戏加载失败，请刷新页面重试');
         }
+    }
+
+    /**
+     * 预加载所有图片资源
+     */
+    async preloadAssets() {
+        const allSceneIds = this.gameData.getAllSceneIds();
+        const imagesToLoad = [];
+        const imageUrls = new Set();
+
+        // 收集所有需要加载的图片URL
+        allSceneIds.forEach(sceneId => {
+            const bgPath = this.gameData.getSceneBackgroundPath(sceneId);
+            const npcPath = this.gameData.getSceneNpcCharacterPath(sceneId);
+            
+            if (bgPath && !imageUrls.has(bgPath)) {
+                imageUrls.add(bgPath);
+                imagesToLoad.push(bgPath);
+            }
+            
+            if (npcPath && !imageUrls.has(npcPath)) {
+                imageUrls.add(npcPath);
+                imagesToLoad.push(npcPath);
+            }
+        });
+
+        if (imagesToLoad.length === 0) {
+            return;
+        }
+
+        console.log(`开始预加载 ${imagesToLoad.length} 张图片...`);
+
+        // 预加载所有图片
+        const loadPromises = imagesToLoad.map(url => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`图片加载成功: ${url.substring(0, 50)}...`);
+                    resolve();
+                };
+                img.onerror = () => {
+                    console.warn(`图片加载失败: ${url.substring(0, 50)}...`);
+                    resolve(); // 即使失败也继续
+                };
+                img.src = url;
+            });
+        });
+
+        await Promise.all(loadPromises);
+        console.log('所有图片预加载完成');
     }
 
     /**
