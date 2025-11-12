@@ -128,8 +128,8 @@ class UploadManager {
             this.updateProgress(30, '正在验证文件结构...');
             
             // 验证必需的文件
-            if (!zip.file('script.json')) {
-                throw new Error('ZIP文件中缺少script.json文件');
+            if (!zip.file('game_script.json')) {
+                throw new Error('ZIP文件中缺少game_script.json文件');
             }
             
             this.updateProgress(50, '正在保存游戏资源...');

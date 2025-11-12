@@ -55,10 +55,10 @@ class GameData {
         this.introScript = JSON.parse(introData);
         
         // 加载主体脚本（从上传的数据中）
-        if (!gameData['script.json']) {
-            throw new Error('游戏资源包中缺少script.json');
+        if (!gameData['game_script.json']) {
+            throw new Error('游戏资源包中缺少game_script.json');
         }
-        const mainScriptContent = atob(gameData['script.json']);
+        const mainScriptContent = atob(gameData['game_script.json']);
         this.mainScript = JSON.parse(mainScriptContent);
         
         // 加载 ending
@@ -98,8 +98,8 @@ class GameData {
         }
         this.introScript = await introResponse.json();
         
-        // 加载主体脚本（从game_assets/siteName/script.json读取）
-        const mainResponse = await fetch(`./game_assets/${this.siteName}/script.json`);
+        // 加载主体脚本（从game_assets/siteName/game_script.json读取）
+        const mainResponse = await fetch(`./game_assets/${this.siteName}/game_script.json`);
         if (!mainResponse.ok) {
             throw new Error(`加载主体脚本失败! status: ${mainResponse.status}`);
         }
@@ -174,12 +174,12 @@ class GameData {
         
         const scene = this.getScene(sceneId);
         
-        if (scene && scene.bg) {
+        if (scene && scene.bg_pic) {
             // 检查是否为上传的游戏
             if (this.uploadedGameData) {
-                return this.getUploadedImageDataUrl(`bg/${scene.bg}`);
+                return this.getUploadedImageDataUrl(`bg/${scene.bg_pic}`);
             }
-            return `./game_assets/${this.siteName}/bg/${scene.bg}`;
+            return `./game_assets/${this.siteName}/bg/${scene.bg_pic}`;
         }
         
         // 如果场景没有指定背景，返回null
