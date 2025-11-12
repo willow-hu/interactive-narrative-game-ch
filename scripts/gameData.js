@@ -9,6 +9,92 @@ class GameData {
         this.endingScript = null;
         this.siteName = siteName;
         this.uploadedGameData = null;
+        this.db = null;
+        this.DB_NAME = 'GameStorage';
+        this.DB_VERSION = 1;
+        this.STORE_NAME = 'gameFiles';
+    }
+
+    /**
+     * 初始化 IndexedDB 连接
+     */
+    async initDB() {
+        if (this.db) {
+            return; // 已经初始化
+        }
+        
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+            
+            request.onerror = () => {
+                console.error('IndexedDB打开失败:', request.error);
+                reject(request.error);
+            };
+            
+            request.onsuccess = () => {
+                this.db = request.result;
+                resolve();
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+                    const objectStore = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
+                    objectStore.createIndex('gameName', 'gameName', { unique: false });
+                }
+            };
+        });
+    }
+
+    /**
+     * 从 IndexedDB 读取文件
+     */
+    async getFileFromDB(gameName, filePath) {
+        if (!this.db) {
+            await this.initDB();
+        }
+        
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.STORE_NAME], 'readonly');
+            const objectStore = transaction.objectStore(this.STORE_NAME);
+            const request = objectStore.get(`${gameName}/${filePath}`);
+            
+            request.onsuccess = () => {
+                resolve(request.result);
+            };
+            
+            request.onerror = () => {
+                reject(request.error);
+            };
+        });
+    }
+
+    /**
+     * 从 IndexedDB 读取游戏的所有文件
+     */
+    async getAllGameFilesFromDB(gameName) {
+        if (!this.db) {
+            await this.initDB();
+        }
+        
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.STORE_NAME], 'readonly');
+            const objectStore = transaction.objectStore(this.STORE_NAME);
+            const index = objectStore.index('gameName');
+            const request = index.getAll(gameName);
+            
+            request.onsuccess = () => {
+                const files = {};
+                request.result.forEach(file => {
+                    files[file.path] = file;
+                });
+                resolve(files);
+            };
+            
+            request.onerror = () => {
+                reject(request.error);
+            };
+        });
     }
 
     /**
@@ -36,19 +122,27 @@ class GameData {
      * 检查是否为上传的游戏
      */
     isUploadedGame(siteName) {
-        return localStorage.getItem(`game_${siteName}`) !== null;
+        // 检查游戏列表中是否存在
+        const gamesJson = localStorage.getItem('uploadedGames');
+        if (!gamesJson) return false;
+        
+        const games = JSON.parse(gamesJson);
+        return games.some(g => g.name === siteName);
     }
 
     /**
      * 加载用户上传的游戏脚本
      */
     async loadUploadedGameScript() {
-        const gameDataJson = localStorage.getItem(`game_${this.siteName}`);
-        if (!gameDataJson) {
+        // 初始化数据库连接
+        await this.initDB();
+        
+        // 从 IndexedDB 加载游戏文件
+        const gameData = await this.getAllGameFilesFromDB(this.siteName);
+        
+        if (Object.keys(gameData).length === 0) {
             throw new Error('游戏数据不存在');
         }
-        
-        const gameData = JSON.parse(gameDataJson);
         
         // 加载 intro
         const introData = await this.loadFileFromStorage('./game_scripts/intro.json');
@@ -58,7 +152,10 @@ class GameData {
         if (!gameData['game_script.json']) {
             throw new Error('游戏资源包中缺少game_script.json');
         }
-        const mainScriptContent = atob(gameData['game_script.json']);
+        
+        // 从 Blob 读取文本内容
+        const mainScriptBlob = gameData['game_script.json'].blob;
+        const mainScriptContent = await mainScriptBlob.text();
         this.mainScript = JSON.parse(mainScriptContent);
         
         // 加载 ending
@@ -222,20 +319,14 @@ class GameData {
             return null;
         }
         
-        const base64Data = this.uploadedGameData[relativePath];
-        const extension = relativePath.split('.').pop().toLowerCase();
+        const fileData = this.uploadedGameData[relativePath];
         
-        // 根据文件扩展名确定MIME类型
-        let mimeType = 'image/png';
-        if (extension === 'jpg' || extension === 'jpeg') {
-            mimeType = 'image/jpeg';
-        } else if (extension === 'gif') {
-            mimeType = 'image/gif';
-        } else if (extension === 'webp') {
-            mimeType = 'image/webp';
+        // 将 Blob 转换为 Object URL（更高效，不需要 base64 编码）
+        if (fileData.blob) {
+            return URL.createObjectURL(fileData.blob);
         }
         
-        return `data:${mimeType};base64,${base64Data}`;
+        return null;
     }
 
     /**

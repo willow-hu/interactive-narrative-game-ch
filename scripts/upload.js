@@ -16,8 +16,46 @@ class UploadManager {
         this.gameList = document.getElementById('gameList');
         this.existingGames = document.getElementById('existingGames');
         
-        this.bindEvents();
-        this.loadExistingGames();
+        this.db = null;
+        this.DB_NAME = 'GameStorage';
+        this.DB_VERSION = 1;
+        this.STORE_NAME = 'gameFiles';
+        
+        this.initDB().then(() => {
+            this.bindEvents();
+            this.loadExistingGames();
+        });
+    }
+
+    /**
+     * 初始化 IndexedDB
+     */
+    async initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+            
+            request.onerror = () => {
+                console.error('IndexedDB打开失败:', request.error);
+                reject(request.error);
+            };
+            
+            request.onsuccess = () => {
+                this.db = request.result;
+                console.log('IndexedDB初始化成功');
+                resolve();
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                
+                // 创建对象存储（如果不存在）
+                if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+                    const objectStore = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
+                    objectStore.createIndex('gameName', 'gameName', { unique: false });
+                    console.log('创建对象存储:', this.STORE_NAME);
+                }
+            };
+        });
     }
 
     /**
@@ -119,6 +157,13 @@ class UploadManager {
             return;
         }
 
+        // 检查游戏名是否已存在
+        const games = this.getStoredGames();
+        if (games.some(g => g.name === gameName)) {
+            this.showError('游戏名已存在，请使用其他名称');
+            return;
+        }
+
         try {
             this.showProgress('正在读取文件...');
             
@@ -157,27 +202,103 @@ class UploadManager {
     }
 
     /**
-     * 保存游戏文件
+     * 保存游戏文件到 IndexedDB
      */
     async saveGameFiles(gameName, zip) {
-        const gameData = {};
+        const transaction = this.db.transaction([this.STORE_NAME], 'readwrite');
+        const objectStore = transaction.objectStore(this.STORE_NAME);
         
         // 遍历ZIP中的所有文件
         const promises = [];
+        let fileCount = 0;
+        
         zip.forEach((relativePath, zipEntry) => {
             if (!zipEntry.dir) {
+                fileCount++;
                 promises.push(
-                    zipEntry.async('base64').then(content => {
-                        gameData[relativePath] = content;
+                    zipEntry.async('blob').then(blob => {
+                        // 存储为独立的记录
+                        const fileData = {
+                            id: `${gameName}/${relativePath}`,
+                            gameName: gameName,
+                            path: relativePath,
+                            blob: blob,
+                            type: this.getMimeType(relativePath)
+                        };
+                        
+                        return new Promise((resolve, reject) => {
+                            const request = objectStore.put(fileData);
+                            request.onsuccess = () => resolve();
+                            request.onerror = () => reject(request.error);
+                        });
                     })
                 );
             }
         });
         
         await Promise.all(promises);
+        console.log(`已保存 ${fileCount} 个文件到 IndexedDB`);
         
-        // 保存到localStorage
-        localStorage.setItem(`game_${gameName}`, JSON.stringify(gameData));
+        return new Promise((resolve, reject) => {
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = () => reject(transaction.error);
+        });
+    }
+
+    /**
+     * 根据文件扩展名获取MIME类型
+     */
+    getMimeType(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const mimeTypes = {
+            'json': 'application/json',
+            'png': 'image/png',
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'gif': 'image/gif',
+            'webp': 'image/webp',
+            'svg': 'image/svg+xml'
+        };
+        return mimeTypes[ext] || 'application/octet-stream';
+    }
+
+    /**
+     * 从 IndexedDB 读取游戏文件
+     */
+    async getGameFile(gameName, filePath) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.STORE_NAME], 'readonly');
+            const objectStore = transaction.objectStore(this.STORE_NAME);
+            const request = objectStore.get(`${gameName}/${filePath}`);
+            
+            request.onsuccess = () => {
+                resolve(request.result);
+            };
+            
+            request.onerror = () => {
+                reject(request.error);
+            };
+        });
+    }
+
+    /**
+     * 从 IndexedDB 读取游戏的所有文件
+     */
+    async getAllGameFiles(gameName) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.STORE_NAME], 'readonly');
+            const objectStore = transaction.objectStore(this.STORE_NAME);
+            const index = objectStore.index('gameName');
+            const request = index.getAll(gameName);
+            
+            request.onsuccess = () => {
+                resolve(request.result);
+            };
+            
+            request.onerror = () => {
+                reject(request.error);
+            };
+        });
     }
 
     /**
@@ -191,21 +312,39 @@ class UploadManager {
     /**
      * 删除游戏
      */
-    deleteGame(gameName) {
+    async deleteGame(gameName) {
         if (!confirm(`确定要删除游戏"${gameName}"吗？`)) {
             return;
         }
         
-        // 从localStorage删除游戏数据
-        localStorage.removeItem(`game_${gameName}`);
-        
-        // 从游戏列表中移除
-        const games = this.getStoredGames();
-        const filteredGames = games.filter(g => g.name !== gameName);
-        localStorage.setItem('uploadedGames', JSON.stringify(filteredGames));
-        
-        // 重新加载游戏列表
-        this.loadExistingGames();
+        try {
+            // 从 IndexedDB 删除游戏的所有文件
+            const files = await this.getAllGameFiles(gameName);
+            const transaction = this.db.transaction([this.STORE_NAME], 'readwrite');
+            const objectStore = transaction.objectStore(this.STORE_NAME);
+            
+            files.forEach(file => {
+                objectStore.delete(file.id);
+            });
+            
+            await new Promise((resolve, reject) => {
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+            
+            // 从游戏列表中移除
+            const games = this.getStoredGames();
+            const filteredGames = games.filter(g => g.name !== gameName);
+            localStorage.setItem('uploadedGames', JSON.stringify(filteredGames));
+            
+            // 重新加载游戏列表
+            this.loadExistingGames();
+            
+            console.log(`游戏 ${gameName} 已删除`);
+        } catch (error) {
+            console.error('删除游戏失败:', error);
+            this.showError('删除游戏失败: ' + error.message);
+        }
     }
 
     /**
