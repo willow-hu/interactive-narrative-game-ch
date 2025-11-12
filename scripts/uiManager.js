@@ -585,6 +585,24 @@ class UIManager {
     }
 
     /**
+     * 禁用退出按钮
+     */
+    disableExitButton() {
+        this.elements.exitButton.disabled = true;
+        this.elements.exitButton.style.opacity = '0.5';
+        this.elements.exitButton.style.cursor = 'not-allowed';
+    }
+
+    /**
+     * 启用退出按钮
+     */
+    enableExitButton() {
+        this.elements.exitButton.disabled = false;
+        this.elements.exitButton.style.opacity = '1';
+        this.elements.exitButton.style.cursor = 'pointer';
+    }
+
+    /**
      * 绑定历史按钮
      * @param {Function} callback - 回调函数
      */
@@ -650,5 +668,8 @@ class UIManager {
         this.elements.npcText.style.cursor = 'default';
         this.elements.npcText.classList.remove('typing');
         this.elements.skipHint.classList.remove('visible');
+        
+        // 重新启用退出按钮
+        this.enableExitButton();
     }
 }

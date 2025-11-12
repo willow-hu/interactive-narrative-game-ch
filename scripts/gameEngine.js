@@ -196,9 +196,10 @@ class GameEngine {
         // 显示NPC文本
         const buttonType = isEndingScene ? 'complete' : 'continue';
         
-        // 如果是结局场景，标记游戏结束
+        // 如果是结局场景，标记游戏结束并禁用退出按钮
         if (isEndingScene) {
             this.gameState.endGame();
+            this.uiManager.disableExitButton();
         }
         
         this.uiManager.showNpcText(scene.content || scene.npc, () => {
