@@ -62,7 +62,7 @@ app.post('/api/upload-game', upload.single('zipFile'), (req, res) => {
         }
         
         // 目标目录
-        const targetDir = path.join(__dirname, 'game_assets', gameName);
+        const targetDir = path.join(__dirname, 'game_projects', gameName);
         
         // 检查游戏名是否已存在
         if (fs.existsSync(targetDir)) {
@@ -143,7 +143,7 @@ app.delete('/api/games/:gameName', (req, res) => {
             return res.status(400).json({ error: '无效的游戏名称' });
         }
         
-        const gameDir = path.join(__dirname, 'game_assets', gameName);
+        const gameDir = path.join(__dirname, 'game_projects', gameName);
         
         // 检查目录是否存在
         if (!fs.existsSync(gameDir)) {
@@ -170,7 +170,7 @@ app.delete('/api/games/:gameName', (req, res) => {
 app.get('/api/games/:gameName/check', (req, res) => {
     try {
         const { gameName } = req.params;
-        const gameDir = path.join(__dirname, 'game_assets', gameName);
+        const gameDir = path.join(__dirname, 'game_projects', gameName);
         const exists = fs.existsSync(gameDir);
         
         res.json({ exists });
@@ -183,7 +183,7 @@ app.get('/api/games/:gameName/check', (req, res) => {
  * 保存游戏信息到 JSON 文件
  */
 function saveGameInfo(gameName) {
-    const gamesFile = path.join(__dirname, 'game_assets', 'games.json');
+    const gamesFile = path.join(__dirname, 'game_projects', 'games.json');
     let games = [];
     
     if (fs.existsSync(gamesFile)) {
@@ -214,7 +214,7 @@ function saveGameInfo(gameName) {
  * 从游戏信息文件中移除游戏
  */
 function removeGameInfo(gameName) {
-    const gamesFile = path.join(__dirname, 'game_assets', 'games.json');
+    const gamesFile = path.join(__dirname, 'game_projects', 'games.json');
     
     if (fs.existsSync(gamesFile)) {
         const content = fs.readFileSync(gamesFile, 'utf-8');
@@ -228,7 +228,7 @@ function removeGameInfo(gameName) {
  * 获取游戏列表
  */
 function getGameList() {
-    const gamesFile = path.join(__dirname, 'game_assets', 'games.json');
+    const gamesFile = path.join(__dirname, 'game_projects', 'games.json');
     
     if (fs.existsSync(gamesFile)) {
         const content = fs.readFileSync(gamesFile, 'utf-8');

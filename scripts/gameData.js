@@ -62,7 +62,7 @@ class GameData {
         this.introScript = JSON.parse(introData);
         
         // 加载主体脚本（从服务器上传目录中）
-        const mainResponse = await fetch(`./game_assets/${this.siteName}/game_script.json`);
+        const mainResponse = await fetch(`./game_projects/${this.siteName}/game_script.json`);
         if (!mainResponse.ok) {
             throw new Error('游戏资源包中缺少game_script.json');
         }
@@ -102,8 +102,8 @@ class GameData {
         }
         this.introScript = await introResponse.json();
         
-        // 加载主体脚本（从game_assets/siteName/game_script.json读取）
-        const mainResponse = await fetch(`./game_assets/${this.siteName}/game_script.json`);
+        // 加载主体脚本（从game_projects/siteName/game_script.json读取）
+        const mainResponse = await fetch(`./game_projects/${this.siteName}/game_script.json`);
         if (!mainResponse.ok) {
             throw new Error(`加载主体脚本失败! status: ${mainResponse.status}`);
         }
@@ -179,7 +179,7 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.bg) {
-            return `./game_assets/${this.siteName}/assets/bg/${scene.bg}`;
+            return `./game_projects/${this.siteName}/assets/bg/${scene.bg}`;
         }
         
         // 如果场景没有指定背景，返回null
@@ -200,7 +200,7 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.npc_pic) {
-            return `./game_assets/${this.siteName}/assets/npc/${scene.npc_pic}`;
+            return `./game_projects/${this.siteName}/assets/npc/${scene.npc_pic}`;
         }
         
         // 如果场景没有指定立绘，返回null

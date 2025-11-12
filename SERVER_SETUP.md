@@ -2,7 +2,7 @@
 
 ## 概述
 
-本系统已更新为使用 Node.js + Express 后端，上传的游戏压缩包会直接解压到服务器的 `game_assets/` 目录中。
+本系统已更新为使用 Node.js + Express 后端，上传的游戏压缩包会直接解压到服务器的 `game_projects/` 目录中。
 
 ## 安装步骤
 
@@ -69,7 +69,7 @@ npm run dev
 project/
 ├── server.js              # Express 服务器
 ├── package.json          # 项目配置
-├── game_assets/          # 游戏资源目录
+├── game_projects/          # 游戏资源目录
 │   ├── sample/          # 预设游戏（苏州双塔）
 │   │   ├── game_script.json
 │   │   └── assets/
@@ -130,6 +130,6 @@ const PORT = 3000; // 改为其他端口号
 - 确认 ZIP 文件格式正确
 
 ### 3. 游戏加载失败
-- 确认 `game_assets/` 目录权限
+- 确认 `game_projects/` 目录权限
 - 检查浏览器控制台的错误信息
 - 验证 `game_script.json` 格式是否正确

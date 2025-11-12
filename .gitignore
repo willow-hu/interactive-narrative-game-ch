@@ -1,6 +1,6 @@
 # Game assets
 imgs/
-game_assets/
+game_projects/
 .prompts/
 
 # Node.js
@@ -14,11 +14,11 @@ package-lock.json
 temp_uploads/
 
 # 用户上传的游戏资源（保留示例游戏）
-game_assets/*/
-!game_assets/sample/
+game_projects/*/
+!game_projects/sample/
 
 # 游戏列表文件（动态生成）
-game_assets/games.json
+game_projects/games.json
 
 # 编辑器
 .vscode/
