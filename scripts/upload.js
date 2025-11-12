@@ -52,7 +52,17 @@ class UploadManager {
         try {
             const response = await fetch('/api/games');
             const data = await response.json();
-            const games = data.games || [];
+            let games = data.games || [];
+            
+            // 添加预设游戏到列表
+            const presetGame = {
+                name: 'sample',
+                displayName: '苏州双塔（预设游戏）',
+                createTime: '系统预设'
+            };
+            
+            // 将预设游戏添加到列表开头
+            games.unshift(presetGame);
             
             if (games.length > 0) {
                 this.gameList.style.display = 'block';
@@ -62,6 +72,10 @@ class UploadManager {
                     const gameItem = document.createElement('div');
                     gameItem.className = 'game-item';
                     
+                    // 预设游戏不显示删除按钮
+                    const deleteButton = game.name === 'sample' ? '' : 
+                        `<button class="game-button delete-button" onclick="uploadManager.deleteGame('${game.name}')">删除</button>`;
+                    
                     gameItem.innerHTML = `
                         <div class="game-info">
                             <div class="game-name">${game.displayName || game.name}</div>
@@ -69,7 +83,7 @@ class UploadManager {
                         </div>
                         <div class="game-actions">
                             <button class="game-button play-button" onclick="uploadManager.playGame('${game.name}')">开始游戏</button>
-                            <button class="game-button delete-button" onclick="uploadManager.deleteGame('${game.name}')">删除</button>
+                            ${deleteButton}
                         </div>
                     `;
                     

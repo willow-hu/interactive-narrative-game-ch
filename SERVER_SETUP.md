@@ -71,7 +71,15 @@ project/
 ├── package.json          # 项目配置
 ├── game_assets/          # 游戏资源目录
 │   ├── sample/          # 预设游戏（苏州双塔）
+│   │   ├── game_script.json
+│   │   └── assets/
+│   │       ├── bg/
+│   │       └── npc/
 │   ├── [上传的游戏]/     # 用户上传的游戏会解压到这里
+│   │   ├── game_script.json
+│   │   └── assets/
+│   │       ├── bg/
+│   │       └── npc/
 │   └── games.json       # 游戏列表信息
 ├── temp_uploads/         # 临时上传目录（自动创建）
 ├── scripts/             # 前端脚本
@@ -86,12 +94,13 @@ project/
 ```
 game.zip
 ├── game_script.json     # 必需：游戏脚本
-├── bg/                  # 可选：背景图片目录
-│   ├── scene1.png
-│   └── ...
-└── npc/                 # 可选：NPC 立绘目录
-    ├── character1.png
-    └── ...
+└── assets/              # 资源目录
+    ├── bg/              # 可选：背景图片目录
+    │   ├── scene1.png
+    │   └── ...
+    └── npc/             # 可选：NPC 立绘目录
+        ├── character1.png
+        └── ...
 ```
 
 ## 注意事项

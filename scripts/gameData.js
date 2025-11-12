@@ -179,7 +179,7 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.bg) {
-            return `./game_assets/${this.siteName}/bg/${scene.bg}`;
+            return `./game_assets/${this.siteName}/assets/bg/${scene.bg}`;
         }
         
         // 如果场景没有指定背景，返回null
@@ -200,7 +200,7 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.npc_pic) {
-            return `./game_assets/${this.siteName}/npc/${scene.npc_pic}`;
+            return `./game_assets/${this.siteName}/assets/npc/${scene.npc_pic}`;
         }
         
         // 如果场景没有指定立绘，返回null
