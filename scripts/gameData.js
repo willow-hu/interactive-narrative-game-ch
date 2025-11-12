@@ -9,92 +9,6 @@ class GameData {
         this.endingScript = null;
         this.siteName = siteName;
         this.uploadedGameData = null;
-        this.db = null;
-        this.DB_NAME = 'GameStorage';
-        this.DB_VERSION = 1;
-        this.STORE_NAME = 'gameFiles';
-    }
-
-    /**
-     * 初始化 IndexedDB 连接
-     */
-    async initDB() {
-        if (this.db) {
-            return; // 已经初始化
-        }
-        
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
-            
-            request.onerror = () => {
-                console.error('IndexedDB打开失败:', request.error);
-                reject(request.error);
-            };
-            
-            request.onsuccess = () => {
-                this.db = request.result;
-                resolve();
-            };
-            
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains(this.STORE_NAME)) {
-                    const objectStore = db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
-                    objectStore.createIndex('gameName', 'gameName', { unique: false });
-                }
-            };
-        });
-    }
-
-    /**
-     * 从 IndexedDB 读取文件
-     */
-    async getFileFromDB(gameName, filePath) {
-        if (!this.db) {
-            await this.initDB();
-        }
-        
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.STORE_NAME], 'readonly');
-            const objectStore = transaction.objectStore(this.STORE_NAME);
-            const request = objectStore.get(`${gameName}/${filePath}`);
-            
-            request.onsuccess = () => {
-                resolve(request.result);
-            };
-            
-            request.onerror = () => {
-                reject(request.error);
-            };
-        });
-    }
-
-    /**
-     * 从 IndexedDB 读取游戏的所有文件
-     */
-    async getAllGameFilesFromDB(gameName) {
-        if (!this.db) {
-            await this.initDB();
-        }
-        
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.STORE_NAME], 'readonly');
-            const objectStore = transaction.objectStore(this.STORE_NAME);
-            const index = objectStore.index('gameName');
-            const request = index.getAll(gameName);
-            
-            request.onsuccess = () => {
-                const files = {};
-                request.result.forEach(file => {
-                    files[file.path] = file;
-                });
-                resolve(files);
-            };
-            
-            request.onerror = () => {
-                reject(request.error);
-            };
-        });
     }
 
     /**
@@ -103,10 +17,10 @@ class GameData {
     async loadGameScript() {
         try {
             // 检查是否为用户上传的游戏
-            const isUploadedGame = this.isUploadedGame(this.siteName);
+            const isUploadedGame = await this.isUploadedGame(this.siteName);
             
             if (isUploadedGame) {
-                // 从localStorage加载用户上传的游戏
+                // 从服务器加载用户上传的游戏
                 return await this.loadUploadedGameScript();
             } else {
                 // 从服务器加载预设游戏
@@ -121,49 +35,42 @@ class GameData {
     /**
      * 检查是否为上传的游戏
      */
-    isUploadedGame(siteName) {
-        // 检查游戏列表中是否存在
-        const gamesJson = localStorage.getItem('uploadedGames');
-        if (!gamesJson) return false;
+    async isUploadedGame(siteName) {
+        // 预设游戏列表
+        const presetGames = ['sample'];
+        if (presetGames.includes(siteName)) {
+            return false;
+        }
         
-        const games = JSON.parse(gamesJson);
-        return games.some(g => g.name === siteName);
+        // 检查服务器上是否存在该游戏
+        try {
+            const response = await fetch(`/api/games/${siteName}/check`);
+            const data = await response.json();
+            return data.exists;
+        } catch (error) {
+            console.error('检查游戏是否存在失败:', error);
+            return false;
+        }
     }
 
     /**
      * 加载用户上传的游戏脚本
      */
     async loadUploadedGameScript() {
-        // 初始化数据库连接
-        await this.initDB();
-        
-        // 从 IndexedDB 加载游戏文件
-        const gameData = await this.getAllGameFilesFromDB(this.siteName);
-        
-        if (Object.keys(gameData).length === 0) {
-            throw new Error('游戏数据不存在');
-        }
-        
         // 加载 intro
         const introData = await this.loadFileFromStorage('./game_scripts/intro.json');
         this.introScript = JSON.parse(introData);
         
-        // 加载主体脚本（从上传的数据中）
-        if (!gameData['game_script.json']) {
+        // 加载主体脚本（从服务器上传目录中）
+        const mainResponse = await fetch(`./game_assets/${this.siteName}/game_script.json`);
+        if (!mainResponse.ok) {
             throw new Error('游戏资源包中缺少game_script.json');
         }
-        
-        // 从 Blob 读取文本内容
-        const mainScriptBlob = gameData['game_script.json'].blob;
-        const mainScriptContent = await mainScriptBlob.text();
-        this.mainScript = JSON.parse(mainScriptContent);
+        this.mainScript = await mainResponse.json();
         
         // 加载 ending
         const endingData = await this.loadFileFromStorage('./game_scripts/ending.json');
         this.endingScript = JSON.parse(endingData);
-        
-        // 保存游戏数据供后续使用
-        this.uploadedGameData = gameData;
         
         return true;
     }
@@ -272,10 +179,6 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.bg) {
-            // 检查是否为上传的游戏
-            if (this.uploadedGameData) {
-                return this.getUploadedImageDataUrl(`bg/${scene.bg}`);
-            }
             return `./game_assets/${this.siteName}/bg/${scene.bg}`;
         }
         
@@ -297,35 +200,10 @@ class GameData {
         const scene = this.getScene(sceneId);
         
         if (scene && scene.npc_pic) {
-            // 检查是否为上传的游戏
-            if (this.uploadedGameData) {
-                return this.getUploadedImageDataUrl(`npc/${scene.npc_pic}`);
-            }
             return `./game_assets/${this.siteName}/npc/${scene.npc_pic}`;
         }
         
         // 如果场景没有指定立绘，返回null
-        return null;
-    }
-
-    /**
-     * 从上传的游戏数据中获取图片的Data URL
-     * @param {string} relativePath - 相对路径
-     * @returns {string|null} Data URL或null
-     */
-    getUploadedImageDataUrl(relativePath) {
-        if (!this.uploadedGameData || !this.uploadedGameData[relativePath]) {
-            console.warn(`找不到上传的图片: ${relativePath}`);
-            return null;
-        }
-        
-        const fileData = this.uploadedGameData[relativePath];
-        
-        // 将 Blob 转换为 Object URL（更高效，不需要 base64 编码）
-        if (fileData.blob) {
-            return URL.createObjectURL(fileData.blob);
-        }
-        
         return null;
     }
 
