@@ -1,6 +1,6 @@
 # Game assets
 imgs/
-# game_assets/
+game_assets/
 .prompts/
 
 # Node.js
