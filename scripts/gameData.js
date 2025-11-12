@@ -174,12 +174,12 @@ class GameData {
         
         const scene = this.getScene(sceneId);
         
-        if (scene && scene.bg_pic) {
+        if (scene && scene.bg) {
             // 检查是否为上传的游戏
             if (this.uploadedGameData) {
-                return this.getUploadedImageDataUrl(`bg/${scene.bg_pic}`);
+                return this.getUploadedImageDataUrl(`bg/${scene.bg}`);
             }
-            return `./game_assets/${this.siteName}/bg/${scene.bg_pic}`;
+            return `./game_assets/${this.siteName}/bg/${scene.bg}`;
         }
         
         // 如果场景没有指定背景，返回null
