@@ -13,8 +13,8 @@ package-lock.json
 temp_uploads/
 
 # 用户上传的游戏资源（保留示例游戏）
-# game_projects/*/
-# !game_projects/sample/
+game_projects/*/
+!game_projects/sample/
 
 # 游戏列表文件（动态生成）
 game_projects/games.json
