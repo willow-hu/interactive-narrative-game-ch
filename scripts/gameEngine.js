@@ -276,7 +276,8 @@ class GameEngine {
             // 处理普通选项
             const optionKey = this.gameState.generateOptionKey(
                 this.gameState.currentScene, 
-                option.user
+                option.user,
+                option.next
             );
             
             this.gameState.selectOption(optionKey, option.user, option.next);

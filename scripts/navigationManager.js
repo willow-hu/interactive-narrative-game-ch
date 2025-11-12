@@ -185,7 +185,7 @@ class NavigationManager {
                 return false;
             }
             
-            const optionKey = this.gameState.generateOptionKey(sceneId, option.user);
+            const optionKey = this.gameState.generateOptionKey(sceneId, option.user, option.next);
             return !this.gameState.selectedOptions.has(optionKey);
         });
     }

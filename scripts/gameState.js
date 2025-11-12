@@ -89,7 +89,7 @@ class GameState {
         if (!options) return [];
         
         return options.filter(option => {
-            const optionKey = `${this.currentScene}_${option.user}`;
+            const optionKey = this.generateOptionKey(this.currentScene, option.user, option.next);
             return !this.selectedOptions.has(optionKey);
         });
     }
@@ -98,9 +98,14 @@ class GameState {
      * 生成选项的唯一标识
      * @param {string} sceneId - 场景ID
      * @param {string} userText - 用户文本
+     * @param {string} nextScene - 下一个场景ID（可选）
      * @returns {string} 选项的唯一标识
      */
-    generateOptionKey(sceneId, userText) {
+    generateOptionKey(sceneId, userText, nextScene = null) {
+        // 如果提供了nextScene，使用它来确保唯一性（处理相同文本的不同选项）
+        if (nextScene) {
+            return `${sceneId}_${userText}_${nextScene}`;
+        }
         return `${sceneId}_${userText}`;
     }
 
