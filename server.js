@@ -64,9 +64,11 @@ app.post('/api/upload-game', upload.single('zipFile'), (req, res) => {
         // 目标目录
         const targetDir = path.join(__dirname, 'game_assets', gameName);
         
-        // 如果目录已存在，先删除
+        // 检查游戏名是否已存在
         if (fs.existsSync(targetDir)) {
-            fs.rmSync(targetDir, { recursive: true, force: true });
+            // 删除临时上传的文件
+            fs.unlinkSync(req.file.path);
+            return res.status(409).json({ error: '游戏名已存在，请使用其他名称' });
         }
         
         // 创建目标目录
