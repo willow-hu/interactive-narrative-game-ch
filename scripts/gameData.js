@@ -3,12 +3,10 @@
  * 负责加载和管理游戏脚本数据
  */
 class GameData {
-    constructor(siteName = 'sample') {
-        this.introScript = null;
-        this.mainScript = null;
-        this.endingScript = null;
+    constructor(siteName = 'twin_pagoda') {
+        this.gameScript = null;
+        this.metadata = null;
         this.siteName = siteName;
-        this.uploadedGameData = null;
     }
 
     /**
@@ -16,107 +14,17 @@ class GameData {
      */
     async loadGameScript() {
         try {
-            // 检查是否为用户上传的游戏
-            const isUploadedGame = await this.isUploadedGame(this.siteName);
-            
-            if (isUploadedGame) {
-                // 从服务器加载用户上传的游戏
-                return await this.loadUploadedGameScript();
-            } else {
-                // 从服务器加载预设游戏
-                return await this.loadPresetGameScript();
+            const response = await fetch(`./game_scripts/${this.siteName}.json`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+            this.gameScript = await response.json();
+            this.metadata = this.gameScript.metadata;
+            return true;
         } catch (error) {
             console.error('加载游戏脚本失败:', error);
             return false;
         }
-    }
-
-    /**
-     * 检查是否为上传的游戏
-     */
-    async isUploadedGame(siteName) {
-        // 预设游戏列表
-        const presetGames = ['sample'];
-        if (presetGames.includes(siteName)) {
-            return false;
-        }
-        
-        // 检查服务器上是否存在该游戏
-        try {
-            const response = await fetch(`/api/games/${siteName}/check`);
-            const data = await response.json();
-            return data.exists;
-        } catch (error) {
-            console.error('检查游戏是否存在失败:', error);
-            return false;
-        }
-    }
-
-    /**
-     * 加载用户上传的游戏脚本
-     */
-    async loadUploadedGameScript() {
-        // 加载 intro
-        const introData = await this.loadFileFromStorage('./game_scripts/intro.json');
-        this.introScript = JSON.parse(introData);
-        
-        // 加载主体脚本（从服务器上传目录中）
-        const mainResponse = await fetch(`./game_projects/${this.siteName}/game_script.json`);
-        if (!mainResponse.ok) {
-            throw new Error('游戏资源包中缺少game_script.json');
-        }
-        this.mainScript = await mainResponse.json();
-        
-        // 加载 ending
-        const endingData = await this.loadFileFromStorage('./game_scripts/ending.json');
-        this.endingScript = JSON.parse(endingData);
-        
-        return true;
-    }
-
-    /**
-     * 从localStorage或服务器加载文件
-     */
-    async loadFileFromStorage(path) {
-        try {
-            const response = await fetch(path);
-            if (!response.ok) {
-                throw new Error(`加载失败: ${path}`);
-            }
-            return await response.text();
-        } catch (error) {
-            console.error('加载文件失败:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * 加载预设游戏脚本
-     */
-    async loadPresetGameScript() {
-        // 加载 intro
-        const introResponse = await fetch('./game_scripts/intro.json');
-        if (!introResponse.ok) {
-            throw new Error(`加载 intro 失败! status: ${introResponse.status}`);
-        }
-        this.introScript = await introResponse.json();
-        
-        // 加载主体脚本（从game_projects/siteName/game_script.json读取）
-        const mainResponse = await fetch(`./game_projects/${this.siteName}/game_script.json`);
-        if (!mainResponse.ok) {
-            throw new Error(`加载主体脚本失败! status: ${mainResponse.status}`);
-        }
-        this.mainScript = await mainResponse.json();
-        
-        // 加载 ending
-        const endingResponse = await fetch('./game_scripts/ending.json');
-        if (!endingResponse.ok) {
-            throw new Error(`加载 ending 失败! status: ${endingResponse.status}`);
-        }
-        this.endingScript = await endingResponse.json();
-        
-        return true;
     }
 
     /**
@@ -126,18 +34,18 @@ class GameData {
      */
     getScene(sceneId) {
         // 首先在intro中查找
-        if (this.introScript && this.introScript[sceneId]) {
-            return this.introScript[sceneId];
+        if (this.gameScript.intro && this.gameScript.intro[sceneId]) {
+            return this.gameScript.intro[sceneId];
         }
         
-        // 然后在主体脚本中查找
-        if (this.mainScript && this.mainScript[sceneId]) {
-            return this.mainScript[sceneId];
+        // 然后在main_game中查找
+        if (this.gameScript.main_game && this.gameScript.main_game[sceneId]) {
+            return this.gameScript.main_game[sceneId];
         }
         
         // 最后在ending中查找
-        if (this.endingScript && this.endingScript[sceneId]) {
-            return this.endingScript[sceneId];
+        if (this.gameScript.ending && this.gameScript.ending[sceneId]) {
+            return this.gameScript.ending[sceneId];
         }
         
         return null;
@@ -150,70 +58,68 @@ class GameData {
     getAllSceneIds() {
         const sceneIds = [];
         
-        if (this.introScript) {
-            sceneIds.push(...Object.keys(this.introScript));
+        if (this.gameScript.intro) {
+            sceneIds.push(...Object.keys(this.gameScript.intro));
         }
         
-        if (this.mainScript) {
-            sceneIds.push(...Object.keys(this.mainScript));
+        if (this.gameScript.main_game) {
+            sceneIds.push(...Object.keys(this.gameScript.main_game));
         }
         
-        if (this.endingScript) {
-            sceneIds.push(...Object.keys(this.endingScript));
+        if (this.gameScript.ending) {
+            sceneIds.push(...Object.keys(this.gameScript.ending));
         }
         
         return sceneIds;
     }
 
     /**
+     * 获取游戏元数据
+     * @returns {Object} 元数据对象
+     */
+    getMetadata() {
+        return this.metadata;
+    }
+
+    /**
+     * 获取背景图片路径
+     * @returns {string} 背景图片路径
+     */
+    getBackgroundPath() {
+        return `./imgs/${this.siteName}/bg.png`;
+    }
+
+    /**
      * 获取特定场景的背景图片路径
      * @param {string} sceneId - 场景ID
-     * @returns {string|null} 背景图片路径，如果不需要背景则返回null
+     * @returns {string} 背景图片路径
      */
     getSceneBackgroundPath(sceneId) {
-        // 引导语和结束语不显示背景
-        if (this.isIntroScene(sceneId) || this.isEndingScene(sceneId)) {
-            return null;
+        // 获取背景映射配置
+        const config = window.GAME_CONFIG;
+        if (!config || !config.backgroundMapping || !config.backgroundMapping[this.siteName]) {
+            return `./imgs/${this.siteName}/bg.png`; // 返回默认背景
+        }
+
+        const mapping = config.backgroundMapping[this.siteName];
+        
+        // 遍历映射配置，查找场景对应的背景图
+        for (const [backgroundFile, sceneList] of Object.entries(mapping)) {
+            if (sceneList.includes(sceneId)) {
+                return `./imgs/${this.siteName}/${backgroundFile}`;
+            }
         }
         
-        const scene = this.getScene(sceneId);
-        
-        if (scene && scene.bg) {
-            return `./game_projects/${this.siteName}/assets/bg/${scene.bg}`;
-        }
-        
-        // 如果场景没有指定背景，返回null
-        return null;
+        // 如果没有找到特定背景，返回默认背景
+        return `./imgs/${this.siteName}/bg.png`;
     }
 
     /**
-     * 获取特定场景的NPC立绘路径
-     * @param {string} sceneId - 场景ID
-     * @returns {string|null} NPC立绘路径，如果不需要立绘则返回null
+     * 获取NPC立绘路径
+     * @returns {string} NPC立绘路径
      */
-    getSceneNpcCharacterPath(sceneId) {
-        // 引导语和结束语不显示NPC立绘
-        if (this.isIntroScene(sceneId) || this.isEndingScene(sceneId)) {
-            return null;
-        }
-        
-        const scene = this.getScene(sceneId);
-        
-        if (scene && scene.npc_pic) {
-            return `./game_projects/${this.siteName}/assets/npc/${scene.npc_pic}`;
-        }
-        
-        // 如果场景没有指定立绘，返回null
-        return null;
-    }
-
-    /**
-     * 检查是否为引导语场景
-     * @param {string} sceneId - 场景ID
-     * @returns {boolean} 是否为引导语场景
-     */
-    isIntroScene(sceneId) {
-        return this.introScript && this.introScript[sceneId];
+    getNpcCharacterPath() {
+        return `./imgs/${this.siteName}/npc.png`;
     }
 
     /**
@@ -222,6 +128,20 @@ class GameData {
      * @returns {boolean} 是否为结局场景
      */
     isEndingScene(sceneId) {
-        return this.endingScript && this.endingScript[sceneId];
+        return this.gameScript.ending && this.gameScript.ending[sceneId];
+    }
+
+    /**
+     * 获取结局类型
+     * @param {string} sceneId - 场景ID
+     * @returns {string|null} 结局类型
+     */
+    getEndingType(sceneId) {
+        if (sceneId === 'ending_complete') {
+            return 'complete';
+        } else if (sceneId === 'ending_normal') {
+            return 'normal';
+        }
+        return null;
     }
 }

@@ -31,7 +31,7 @@ class GameState {
      */
     startGame() {
         this.gameStarted = true;
-        this.currentScene = 'intro_0';
+        this.currentScene = 'scene_0_0';
         this.visitScene(this.currentScene);
     }
 
@@ -89,7 +89,7 @@ class GameState {
         if (!options) return [];
         
         return options.filter(option => {
-            const optionKey = this.generateOptionKey(this.currentScene, option.user, option.next);
+            const optionKey = `${this.currentScene}_${option.user}`;
             return !this.selectedOptions.has(optionKey);
         });
     }
@@ -98,14 +98,9 @@ class GameState {
      * 生成选项的唯一标识
      * @param {string} sceneId - 场景ID
      * @param {string} userText - 用户文本
-     * @param {string} nextScene - 下一个场景ID（可选）
      * @returns {string} 选项的唯一标识
      */
-    generateOptionKey(sceneId, userText, nextScene = null) {
-        // 如果提供了nextScene，使用它来确保唯一性（处理相同文本的不同选项）
-        if (nextScene) {
-            return `${sceneId}_${userText}_${nextScene}`;
-        }
+    generateOptionKey(sceneId, userText) {
         return `${sceneId}_${userText}`;
     }
 
@@ -140,9 +135,11 @@ class GameState {
 
     /**
      * 结束游戏
+     * @param {string} endingType - 结局类型
      */
-    endGame() {
+    endGame(endingType) {
         this.gameEnded = true;
+        this.endingType = endingType;
     }
 
     /**

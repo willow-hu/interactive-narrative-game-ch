@@ -48,6 +48,20 @@ body {
     z-index: 1;
 }
 
+/* 景点名称 */
+#siteName {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    z-index: 10;
+    max-width: 60%;
+    line-height: 1.2;
+}
+
 /* 右上角按钮组 */
 #topRightButtons {
     position: absolute;
@@ -82,35 +96,23 @@ body {
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
     z-index: 5;
 }
 
-#tutorialPrompt {
-    color: white;
-    font-size: 24px;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-#startGameButton,
-#skipTutorialButton {
+#startGameButton {
     padding: 15px 30px;
-    font-size: 18px;
+    font-size: 20px;
     background: rgba(0, 0, 0, 0.8);
     color: white;
     border: 2px solid white;
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.3s;
-    min-width: 250px;
 }
 
-#startGameButton:hover,
-#skipTutorialButton:hover {
+#startGameButton:hover {
     background: rgba(255, 255, 255, 0.9);
     color: black;
 }
@@ -140,19 +142,6 @@ body {
     height: 250px;
     display: flex;
     flex-direction: column;
-}
-
-/* 角色名称 */
-#roleName {
-    font-size: 16px;
-    font-weight: bold;
-    color: #ffd700;
-    margin-bottom: 8px;
-    padding: 4px 8px;
-    background: rgba(255, 215, 0, 0.1);
-    border-radius: 5px;
-    display: none;
-    width: fit-content;
 }
 
 #npcText {
@@ -496,76 +485,51 @@ body {
     background: #45a049;
 }
 
-/* 加载提示 */
-#loadingMessage {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    color: white;
-    display: none !important;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
+
+/* 树状结构可视化 - 已禁用 */
+/*
+.tree-container {
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    width: 200px;
+    height: 280px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    z-index: 8;
+    padding: 10px;
+    display: none;
+    overflow: hidden;
 }
 
-#loadingMessage.visible {
-    display: flex !important;
+.tree-node {
+    stroke-width: 2;
+    transition: all 0.3s ease;
 }
 
-.loading-content {
-    text-align: center;
+.tree-node-unvisited {
+    fill: transparent;
+    stroke: transparent;
+    display: none;
 }
 
-.loading-text {
-    font-size: 18px;
+.tree-node-visited {
+    fill: #808080;
+    stroke: #606060;
 }
 
-.loading-hint {
-    margin-top: 15px;
-    font-size: 14px;
-    color: #999;
+.tree-node-current {
+    fill: #4CAF50;
+    stroke: #2E7D32;
 }
 
-/* 错误提示 */
-#errorMessage {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 0, 0, 0.9);
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    font-size: 16px;
-    z-index: 10000;
-    text-align: center;
-    display: none !important;
+.tree-edge {
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 1.5;
+    fill: none;
 }
-
-#errorMessage.visible {
-    display: block !important;
-}
-
-#errorText {
-    margin-bottom: 10px;
-}
-
-#reloadButton {
-    margin-top: 10px;
-    padding: 8px 16px;
-    background: white;
-    color: red;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#reloadButton:hover {
-    background: #f0f0f0;
-}
+*/
 
 /* 针对iPhone的特殊处理 - 已注释 */
 /*
@@ -601,6 +565,11 @@ only screen
     #topRightButtons {
         top: max(15px, env(safe-area-inset-top));
         right: max(15px, env(safe-area-inset-right));
+    }
+    
+    #siteName {
+        top: max(15px, env(safe-area-inset-top));
+        left: max(15px, env(safe-area-inset-left));
     }
     
     /* 手机端树可视化调整 - 已禁用 */

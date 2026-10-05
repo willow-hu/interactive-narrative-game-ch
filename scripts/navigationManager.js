@@ -25,9 +25,9 @@ class NavigationManager {
                 break;
             }
             
-            // 如果回溯到了正式剧情的根节点（第一个主场景），且它没有未探索选项，
+            // 如果回溯到了正式剧情的根节点 scene_1_1，且它没有未探索选项，
             // 则说明所有分支都已探索完毕
-            if (sceneId === 'scene_1') {
+            if (sceneId === 'scene_1_1') {
                 const scene = this.gameData.getScene(sceneId);
                 if (scene && scene.options) {
                     // 只获取原始选项，不包含任何系统添加的返回选项
@@ -36,7 +36,7 @@ class NavigationManager {
                         // 所有分支都已探索，返回结局选项
                         return {
                             user: "谢谢您的讲解",
-                            next: "ending",
+                            next: this.shouldShowCompleteEnding() ? "ending_complete" : "ending_normal",
                             isBack: true
                         };
                     } else {
@@ -68,9 +68,18 @@ class NavigationManager {
         // 如果没有找到未探索的分支，返回结局选项
         return {
             user: "谢谢您的讲解",
-            next: "ending",
+            next: this.shouldShowCompleteEnding() ? "ending_complete" : "ending_normal",
             isBack: true
         };
+    }
+
+    /**
+     * 判断是否应该显示完整结局
+     * @returns {boolean} 是否显示完整结局
+     */
+    shouldShowCompleteEnding() {
+        const allSceneIds = this.gameData.getAllSceneIds();
+        return this.gameState.hasExploredAllScenes(allSceneIds);
     }
 
     /**
@@ -185,7 +194,7 @@ class NavigationManager {
                 return false;
             }
             
-            const optionKey = this.gameState.generateOptionKey(sceneId, option.user, option.next);
+            const optionKey = this.gameState.generateOptionKey(sceneId, option.user);
             return !this.gameState.selectedOptions.has(optionKey);
         });
     }
@@ -196,8 +205,9 @@ class NavigationManager {
      * @returns {boolean} 是否为引导语场景
      */
     isIntroScene(sceneId) {
-        // 引导语场景格式为 intro_n
-        return sceneId.startsWith('intro_');
+        // 引导语场景格式为 scene_0_x（第一个数字为0）
+        const scenePattern = /^scene_0_\d+$/;
+        return scenePattern.test(sceneId);
     }
 
     /**

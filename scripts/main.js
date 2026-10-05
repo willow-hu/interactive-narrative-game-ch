@@ -8,18 +8,23 @@ let gameEngine = null;
 
 /**
  * 获取站点名称参数
- * 可以通过URL参数或默认值获取
+ * 可以通过URL参数、配置文件或默认值获取
  */
 function getSiteName() {
-    // 检查URL参数
+    // 1. 首先检查URL参数
     const urlParams = new URLSearchParams(window.location.search);
     const siteFromUrl = urlParams.get('site');
     if (siteFromUrl) {
         return siteFromUrl;
     }
     
-    // 默认值
-    return 'sample';
+    // 2. 检查是否有配置文件或全局配置
+    if (window.GAME_CONFIG && window.GAME_CONFIG.siteName) {
+        return window.GAME_CONFIG.siteName;
+    }
+    
+    // 3. 默认值
+    return 'twin_pagoda';
 }
 
 /**
@@ -27,12 +32,6 @@ function getSiteName() {
  */
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // 隐藏游戏容器
-        const gameContainer = document.getElementById('gameContainer');
-        if (gameContainer) {
-            gameContainer.style.display = 'none';
-        }
-        
         // 显示加载提示
         showLoadingMessage();
         
@@ -49,11 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 隐藏加载提示
         hideLoadingMessage();
         
-        // 显示游戏容器
-        if (gameContainer) {
-            gameContainer.style.display = 'block';
-        }
-        
         console.log('游戏准备就绪');
         
     } catch (error) {
@@ -66,10 +60,22 @@ document.addEventListener('DOMContentLoaded', async () => {
  * 显示加载提示
  */
 function showLoadingMessage() {
-    const loadingDiv = document.getElementById('loadingMessage');
-    if (loadingDiv) {
-        loadingDiv.classList.add('visible');
-    }
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'loadingMessage';
+    loadingDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        z-index: 1000;
+    `;
+    loadingDiv.textContent = '游戏加载中...';
+    document.body.appendChild(loadingDiv);
 }
 
 /**
@@ -78,7 +84,7 @@ function showLoadingMessage() {
 function hideLoadingMessage() {
     const loadingDiv = document.getElementById('loadingMessage');
     if (loadingDiv) {
-        loadingDiv.classList.remove('visible');
+        loadingDiv.remove();
     }
 }
 
@@ -89,18 +95,33 @@ function hideLoadingMessage() {
 function showErrorMessage(message) {
     hideLoadingMessage();
     
-    const errorDiv = document.getElementById('errorMessage');
-    const errorText = document.getElementById('errorText');
-    const reloadButton = document.getElementById('reloadButton');
-    
-    if (errorDiv && errorText) {
-        errorText.textContent = message;
-        errorDiv.classList.add('visible');
-        
-        if (reloadButton) {
-            reloadButton.onclick = () => window.location.reload();
-        }
-    }
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 0, 0, 0.9);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        z-index: 1000;
+        text-align: center;
+    `;
+    errorDiv.innerHTML = `
+        <p>${message}</p>
+        <button onclick="window.location.reload()" style="
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: white;
+            color: red;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        ">刷新页面</button>
+    `;
+    document.body.appendChild(errorDiv);
 }
 
 /**

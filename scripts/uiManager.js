@@ -24,6 +24,7 @@ class UIManager {
             gameContainer: document.getElementById('gameContainer'),
             background: document.getElementById('background'),
             npcCharacter: document.getElementById('npcCharacter'),
+            siteName: document.getElementById('siteName'),
             
             // 屏幕
             startScreen: document.getElementById('startScreen'),
@@ -31,7 +32,6 @@ class UIManager {
             
             // 按钮
             startGameButton: document.getElementById('startGameButton'),
-            skipTutorialButton: document.getElementById('skipTutorialButton'),
             exitButton: document.getElementById('exitButton'),
             historyButton: document.getElementById('historyButton'),
             continueButton: document.getElementById('continueButton'),
@@ -39,7 +39,6 @@ class UIManager {
             
             // 对话
             dialogueBox: document.getElementById('dialogueBox'),
-            roleName: document.getElementById('roleName'),
             npcText: document.getElementById('npcText'),
             skipHint: document.getElementById('skipHint'),
             
@@ -131,16 +130,9 @@ class UIManager {
 
     /**
      * 切换背景图片（不带过渡效果）
-     * @param {string|null} imagePath - 新的图片路径，null表示使用黑色背景
+     * @param {string} imagePath - 新的图片路径
      */
     changeBackground(imagePath) {
-        // 如果路径为null，设置为黑色背景
-        if (imagePath === null) {
-            this.elements.background.style.backgroundImage = 'none';
-            this.elements.background.style.backgroundColor = '#000000';
-            return;
-        }
-
         // 如果新路径与当前路径相同，不进行切换
         const currentBg = this.elements.background.style.backgroundImage;
         const newBg = `url('${imagePath}')`;
@@ -152,15 +144,12 @@ class UIManager {
         const img = new Image();
         img.onload = () => {
             // 直接切换背景图片
-            this.elements.background.style.backgroundColor = 'transparent';
             this.elements.background.style.backgroundImage = newBg;
         };
         
         img.onerror = () => {
-            // 如果新图片加载失败，使用黑色背景
+            // 如果新图片加载失败，则不进行切换
             console.warn(`背景图片加载失败: ${imagePath}`);
-            this.elements.background.style.backgroundImage = 'none';
-            this.elements.background.style.backgroundColor = '#000000';
         };
         
         img.src = imagePath;
@@ -168,28 +157,10 @@ class UIManager {
 
     /**
      * 设置NPC立绘
-     * @param {string|null} imagePath - NPC立绘图片路径，null表示隐藏立绘
+     * @param {string} imagePath - NPC立绘图片路径
      */
     setNpcCharacter(imagePath) {
-        // 如果路径为null，隐藏NPC立绘
-        if (imagePath === null) {
-            this.hideNpcCharacter();
-            return;
-        }
-
-        // 预加载新图片以确保流畅切换
-        const img = new Image();
-        img.onload = () => {
-            this.elements.npcCharacter.style.backgroundImage = `url('${imagePath}')`;
-        };
-        
-        img.onerror = () => {
-            console.warn(`NPC立绘加载失败: ${imagePath}`);
-            // 加载失败则隐藏立绘
-            this.hideNpcCharacter();
-        };
-        
-        img.src = imagePath;
+        this.elements.npcCharacter.style.backgroundImage = `url('${imagePath}')`;
     }
 
     /**
@@ -207,29 +178,11 @@ class UIManager {
     }
 
     /**
-     * 设置角色名称
+     * 设置景点名称
+     * @param {string} name - 景点名称
      */
-    setRoleName(name) {
-        if (name) {
-            this.elements.roleName.textContent = name;
-            this.showRoleName();
-        } else {
-            this.hideRoleName();
-        }
-    }
-
-    /**
-     * 显示角色名称
-     */
-    showRoleName() {
-        this.elements.roleName.style.display = 'block';
-    }
-
-    /**
-     * 隐藏角色名称
-     */
-    hideRoleName() {
-        this.elements.roleName.style.display = 'none';
+    setSiteName(name) {
+        this.elements.siteName.textContent = name;
     }
 
     /**
@@ -257,15 +210,10 @@ class UIManager {
      * @param {string} text - 要显示的文本
      * @param {Function} onComplete - 完成回调
      * @param {string} buttonType - 按钮类型：'continue' 或 'complete'
-     * @param {boolean} hasNpc - 是否有NPC立绘
      */
-    showNpcText(text, onComplete, buttonType = 'continue', hasNpc = true) {
-        // 只在有NPC立绘时显示（与对话框同步）
-        if (hasNpc) {
-            this.showNpcCharacter();
-        } else {
-            this.hideNpcCharacter();
-        }
+    showNpcText(text, onComplete, buttonType = 'continue') {
+        // 显示NPC立绘（与对话框同步）
+        this.showNpcCharacter();
         
         // 分割文本（以双换行符分割）
         this.currentTextSegments = text.split('\n\n').filter(segment => segment.trim());
@@ -569,37 +517,11 @@ class UIManager {
     }
 
     /**
-     * 绑定跳过教程按钮
-     * @param {Function} callback - 回调函数
-     */
-    onSkipTutorial(callback) {
-        this.elements.skipTutorialButton.addEventListener('click', callback);
-    }
-
-    /**
      * 绑定退出按钮
      * @param {Function} callback - 回调函数
      */
     onExitGame(callback) {
         this.elements.exitButton.addEventListener('click', callback);
-    }
-
-    /**
-     * 禁用退出按钮
-     */
-    disableExitButton() {
-        this.elements.exitButton.disabled = true;
-        this.elements.exitButton.style.opacity = '0.5';
-        this.elements.exitButton.style.cursor = 'not-allowed';
-    }
-
-    /**
-     * 启用退出按钮
-     */
-    enableExitButton() {
-        this.elements.exitButton.disabled = false;
-        this.elements.exitButton.style.opacity = '1';
-        this.elements.exitButton.style.cursor = 'pointer';
     }
 
     /**
@@ -649,7 +571,6 @@ class UIManager {
         this.hideConfirmModal();
         this.hideAchievementModal();
         this.hideNpcCharacter(); // 重置时隐藏NPC立绘，游戏开始时会重新显示
-        this.hideRoleName(); // 重置时隐藏角色名称
         this.elements.continueButton.className = '';
         this.elements.completeButton.className = '';
         this.elements.npcText.innerHTML = '';
@@ -668,8 +589,17 @@ class UIManager {
         this.elements.npcText.style.cursor = 'default';
         this.elements.npcText.classList.remove('typing');
         this.elements.skipHint.classList.remove('visible');
-        
-        // 重新启用退出按钮
-        this.enableExitButton();
     }
 }
+        this.isTyping = false;
+        
+        // 清理打字相关状态
+        if (this.typeTimeoutId) {
+            clearTimeout(this.typeTimeoutId);
+            this.typeTimeoutId = null;
+        }
+        this.currentFullText = '';
+        this.currentTypeCallback = null;
+        this.elements.npcText.style.cursor = 'default';
+        this.elements.npcText.classList.remove('typing');
+        this.elements.skipHint.classList.remove('visible');
